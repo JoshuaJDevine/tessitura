@@ -64,8 +64,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
         
-      - name: Build application
-        run: npm run build
+      - name: Build web application
+        run: npm run build:web
         env:
           CI: true
 

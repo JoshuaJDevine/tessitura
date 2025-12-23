@@ -311,18 +311,32 @@ jobs:
     name: Update GitHub Wiki
     runs-on: ubuntu-latest
     needs: build-and-deploy
+    continue-on-error: true  # Wiki might not be enabled yet
     
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         
+      - name: Check if wiki exists
+        id: check-wiki
+        continue-on-error: true
+        run: |
+          if git ls-remote https://github.com/${{ github.repository }}.wiki.git HEAD > /dev/null 2>&1; then
+            echo "wiki_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "wiki_exists=false" >> $GITHUB_OUTPUT
+            echo "⚠️ Wiki not enabled. Enable it in repository settings to auto-sync documentation."
+          fi
+        
       - name: Checkout wiki
+        if: steps.check-wiki.outputs.wiki_exists == 'true'
         uses: actions/checkout@v4
         with:
           repository: ${{ github.repository }}.wiki
           path: wiki
           
       - name: Update wiki pages
+        if: steps.check-wiki.outputs.wiki_exists == 'true'
         run: |
           # Copy documentation to wiki
           cp README.md wiki/Home.md 2>/dev/null || true
@@ -352,6 +366,7 @@ jobs:
           EOF
           
       - name: Commit and push wiki changes
+        if: steps.check-wiki.outputs.wiki_exists == 'true'
         run: |
           cd wiki
           git config user.name "github-actions[bot]"
