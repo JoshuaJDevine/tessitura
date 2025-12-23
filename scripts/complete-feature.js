@@ -67,9 +67,17 @@ async function main() {
   renameSync(sourcePath, destPath);
 
   console.log(`\n✅ Feature archived: .cursor/features/completed/${featureFile}`);
-  console.log('\n📋 Ready to push!');
-  console.log(`   git push origin feature/${featureName}`);
-  console.log('   Then create a Pull Request on GitHub\n');
+  console.log('\n📋 Next Steps:');
+  console.log('\n1. Push branch to GitHub:');
+  console.log(`   git push -u origin feature/${featureName}`);
+  console.log('\n2. Create Pull Request:');
+  console.log('   GitHub will provide a PR URL in the output');
+  console.log('   Visit that URL to create the PR');
+  console.log('\n3. Review and Merge:');
+  console.log('   - Wait for CI/CD checks to pass');
+  console.log('   - Request reviews if needed');
+  console.log('   - Merge through GitHub interface');
+  console.log('\n⚠️  NEVER merge to main locally - always use GitHub PRs\n');
 
   rl.close();
 }

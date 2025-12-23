@@ -136,6 +136,28 @@ src/
 
 ## 🔄 Git Workflow
 
+### Branch Strategy
+
+**Core Rule: Agents work on branches, never merge to main locally.**
+
+1. **Feature Branches** - All work happens on `feature/name` branches
+2. **Push to GitHub** - Push branches, don't merge locally
+3. **Pull Requests** - Create PRs on GitHub for review
+4. **GitHub Merge** - Merge through GitHub's interface, not locally
+
+```bash
+# ✅ Correct workflow
+git checkout -b feature/new-feature
+# ... work on feature ...
+git push -u origin feature/new-feature
+# Create PR on GitHub → Review → Merge via GitHub
+
+# ❌ Incorrect workflow
+git checkout main
+git merge feature/new-feature  # NEVER do this!
+git push origin main           # NEVER do this!
+```
+
 ### Commit Message Format
 
 ```

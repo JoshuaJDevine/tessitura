@@ -136,6 +136,9 @@ npm run feature:start
 3. Ensure all tests pass and coverage meets standards
 4. Complete all documentation
 5. Run `npm run feature:complete` when done
+6. Push branch to GitHub: `git push -u origin feature/name`
+7. Create PR on GitHub (never merge to main locally)
+8. Merge through GitHub's PR interface after review
 
 ## License
 

@@ -113,13 +113,25 @@
 - [ ] Pre-commit hooks pass
 - [ ] Test coverage meets standards
 - [ ] Manual testing complete
-- [ ] Ready for git push
-- [ ] Ready to create PR
 
-### Push Command
+### Push to GitHub
+**IMPORTANT: Never merge to main locally. Always push branch and create PR on GitHub.**
+
 ```bash
-git push origin [branch-name]
+# Push feature branch to GitHub
+git push -u origin [branch-name]
+
+# GitHub will provide a PR URL, e.g.:
+# https://github.com/username/repo/pull/new/[branch-name]
 ```
+
+### Create Pull Request
+1. Visit the PR URL provided by GitHub
+2. Fill in PR description with feature summary
+3. Link to any related issues
+4. Request reviews if needed
+5. Wait for CI/CD to pass
+6. Merge through GitHub's interface (NOT locally)
 
 ---
 

@@ -281,9 +281,7 @@ New features:
 - [x] All tests written and passing (94% coverage)
 - [x] All documentation updated
 - [x] Pre-commit hooks pass
-- [ ] Manual testing complete
-- [ ] Ready for git push
-- [ ] Ready to create PR
+- [x] Manual testing complete
 ```
 
 **Manual Testing:**
@@ -299,14 +297,22 @@ npm run feature:complete
 
 This will:
 - Archive the feature file to `.cursor/features/completed/`
-- Show you the push command
+- Show you the push instructions
 
 **Push to GitHub:**
 ```bash
-git push origin feature/canvas-zoom
+git push -u origin feature/canvas-zoom
 ```
 
-**Create PR on GitHub**
+**⚠️ IMPORTANT: Never merge to main locally**
+
+**Create PR on GitHub:**
+1. GitHub will show a PR URL in the push output
+2. Visit that URL
+3. Fill in PR description
+4. Request reviews
+5. Wait for CI/CD to pass
+6. **Merge through GitHub's interface** (not locally)
 
 ## 🎨 Why This Works
 
@@ -349,6 +355,25 @@ Engineer: "Add zoom controls"
 6. **Learning** - Review completed features to improve
 
 ## 📝 Templates
+
+## 🚨 Critical Rules
+
+### Agents NEVER Merge to Main
+- ✅ Agents work on feature branches
+- ✅ Agents push branches to GitHub
+- ✅ PRs are created on GitHub
+- ✅ Merging happens through GitHub's interface
+- ❌ NEVER `git merge` to main locally
+- ❌ NEVER push directly to main
+
+### Why?
+1. **Code Review** - PRs enable team review
+2. **CI/CD** - GitHub Actions run on PRs
+3. **Traceability** - PR history shows discussion
+4. **Safety** - Protects main branch
+5. **Collaboration** - Others can review and comment
+
+## 📝 Quick Templates
 
 ### Quick Architecture Prompt
 
