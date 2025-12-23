@@ -9,7 +9,7 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
-  base: './',
+  base: process.env.CI ? '/tessitura/' : './',
   server: {
     port: 5173,
   },
@@ -17,4 +17,3 @@ export default defineConfig({
     outDir: 'dist',
   },
 });
-
