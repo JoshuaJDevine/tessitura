@@ -144,3 +144,6 @@ Category-based default colors:
 - IndexedDB migration for better performance
 
 
+
+
+

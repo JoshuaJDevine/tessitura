@@ -1,0 +1,44 @@
+{
+  "name": "agent-workflow-bootstrap",
+  "version": "1.0.0",
+  "description": "Bootstrap template for 5-agent development workflow",
+  "type": "module",
+  "scripts": {
+    "prepare": "husky install",
+    "feature:start": "node scripts/start-feature.js",
+    "feature:complete": "node scripts/complete-feature.js",
+    "pre-push": "node scripts/pre-push-check.js",
+    "validate:branch": "node scripts/validate-branch-name.js",
+    "docs:validate": "node scripts/validate-docs.js",
+    "create-issue": "node scripts/create-github-issue.js",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint . --ext .ts,.tsx",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
+    "format": "prettier --write \"**/*.{ts,tsx,json,md,css}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,json,md,css}\"",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "eslint": "^8.0.0",
+    "husky": "^8.0.0",
+    "lint-staged": "^15.0.0",
+    "prettier": "^3.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,css}": [
+      "prettier --write"
+    ]
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

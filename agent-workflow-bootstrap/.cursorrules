@@ -1,0 +1,86 @@
+# Agent Workflow Rules
+
+This project uses a 5-agent cascade workflow. Each agent has specific responsibilities and cannot proceed without completing their blockers.
+
+## Available Agents
+
+When invoking agents, use their designations:
+- `@designer` - Requirements, ADRs, branch creation
+- `@coder` - Implementation
+- `@tester` - Test coverage
+- `@documenter` - Documentation
+- `@closer` - Final validation, PR creation
+
+## Agent Rules Location
+
+Full agent definitions are in `.cursor/agents/`:
+- `.cursor/agents/designer.md`
+- `.cursor/agents/coder.md`
+- `.cursor/agents/tester.md`
+- `.cursor/agents/documenter.md`
+- `.cursor/agents/closer.md`
+
+## Workflow Overview
+
+See `.cursor/WORKFLOW.md` for the complete workflow documentation.
+
+## Core Principles
+
+1. **Separation of Concerns**
+   - Each agent does ONE thing well
+   - Agents do NOT do each other's work
+   - Coder doesn't write tests, Tester doesn't write docs
+
+2. **Blockers Enforce Quality**
+   - Agents cannot skip prerequisites
+   - Each agent has a checklist that must be complete
+   - Blockers are documented in each agent file
+
+3. **Clear Handoffs**
+   - Each agent creates documentation in `.cursor/features/active/<feature>/`
+   - Handoff prompts are generated for the next agent
+   - Context is preserved through the cascade
+
+4. **Human Reviews at End**
+   - All work flows to a Pull Request
+   - Human reviews the complete change
+   - Merge happens through GitHub, never locally
+
+## Standards
+
+### Branch Naming
+```
+feature/<kebab-case-name>
+fix/<kebab-case-name>
+chore/<kebab-case-name>
+```
+
+### Commit Messages
+```
+type(scope): description
+
+feat, fix, docs, style, refactor, test, chore
+```
+
+### File Documentation
+Every `.ts`/`.tsx` file needs:
+- Code file: `Component.tsx`
+- Test file: `Component.spec.tsx`
+- Doc file: `Component.md`
+
+## Starting a Feature
+
+1. Run `npm run feature:start`
+2. Invoke `@designer` with your feature request
+3. Follow the cascade through each agent
+4. Review PR created by `@closer`
+5. Merge via GitHub
+6. Run `npm run feature:complete`
+
+## Active Features
+
+Check `.cursor/features/active/` for in-progress features.
+
+## Completed Features
+
+Check `.cursor/features/completed/` for archived feature documentation.

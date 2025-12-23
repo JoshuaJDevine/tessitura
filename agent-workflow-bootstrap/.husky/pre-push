@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🔍 Running pre-push checks..."
+
+# Run all quality checks
+node scripts/pre-push-check.js || exit 1
+
+echo "✅ Pre-push checks passed"

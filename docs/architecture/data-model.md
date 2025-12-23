@@ -1,10 +1,15 @@
 # Data Model Architecture
 
-**Last Updated:** 2024-12-19
+**Last Updated:** 2024-12-22 - Added Deck entity, updated for card collection pivot
 
 ## Overview
 
 The application uses a flat, normalized data structure with relationships stored as ID references. All data is persisted to LocalStorage (with IndexedDB migration planned).
+
+**Recent Changes (2024-12-22):**
+- Added **Deck** entity (replaces Template and InstrumentGroup)
+- Updated Instrument with enhanced usage tracking
+- Removed position data (no longer needed without canvas)
 
 ## Core Entities
 
@@ -35,43 +40,51 @@ interface Instrument {
 **Storage:** `instrument-storage` key in LocalStorage  
 **Store:** `src/store/instrumentStore.ts`
 
-### InstrumentGroup
+### Deck (NEW - Replaces InstrumentGroup and Template)
 
-Visual grouping container for related instruments.
+Curated collection of instruments for specific workflows.
 
 ```typescript
-interface InstrumentGroup {
+interface Deck {
   id: string;
-  name: string;
-  description: string;
+  name: string;                  // "Cinematic Scoring", "Electronic Production"
+  description: string;           // Optional workflow description
   instruments: string[];         // Array of instrument IDs
-  position: { x: number; y: number };
-  color: string;
-  collapsed: boolean;
+  color: string;                 // Hex color for visual theming
+  icon: string;                  // Emoji icon (🎹, 🎸, 🎺)
+  tags: string[];                // User-defined tags
+  metadata: {
+    createdAt: Date;
+    lastUsed?: Date;
+    usageCount: number;          // How many times deck was "used"
+  };
 }
 ```
 
-**Storage:** `group-storage` key in LocalStorage  
-**Store:** `src/store/groupStore.ts`
+**Key Differences from Template/Group:**
+- ✅ No position data (irrelevant without canvas)
+- ✅ Usage tracking (like instruments)
+- ✅ Icon emoji for visual identity
+- ✅ Simplified, focused structure
 
-### Template
+**Storage:** `deck-storage` key in LocalStorage  
+**Store:** `src/store/deckStore.ts`
 
-Reusable workflow configuration for instrument clusters.
+### InstrumentGroup (LEGACY)
 
-```typescript
-interface Template {
-  id: string;
-  name: string;
-  description: string;
-  tags: string[];
-  instruments: string[];         // Array of instrument IDs
-  pairings: Array<{ from: string; to: string; note?: string }>;
-  layout: Record<string, { x: number; y: number }>;  // Relative positions
-}
-```
+**Status:** ⚠️ Superseded by Deck
 
-**Storage:** `template-storage` key in LocalStorage  
-**Store:** `src/store/templateStore.ts`
+Visual grouping container for related instruments on canvas.
+
+**Migration:** Converted to Deck on first app load after update.
+
+### Template (LEGACY)
+
+**Status:** ⚠️ Superseded by Deck
+
+Reusable workflow configuration with canvas layout positions.
+
+**Migration:** Converted to Deck (layout data dropped) on first app load.
 
 ## Relationships
 
@@ -80,22 +93,42 @@ interface Template {
 When instrument A pairs with instrument B:
 - A's `pairings` array contains B's ID
 - B's `pairings` array contains A's ID
-- React Flow edge is created between nodes
 - Relationship is automatically bidirectional
 
 **Implementation:** `createPairing()` in `instrumentStore.ts` enforces bidirectionality.
 
-### Groups
+**Note:** Pairings are less prominent in card UI (no visual edges), but maintained for future features.
 
-Groups contain references to instruments, but instruments don't reference groups (many-to-many relationship stored in group only).
+### Deck Membership
 
-## Data Flow
+Decks contain references to instruments, but instruments don't reference decks (many-to-many relationship stored in deck only).
 
-1. **User Action** → Store method (e.g., `addInstrument()`)
+**Queries:**
+- Find all decks for an instrument: `deckStore.getDecksForInstrument(instrumentId)`
+- Find all instruments in deck: `deck.instruments` array
+
+### Rarity (Computed)
+
+Rarity is **not stored**, but computed from `metadata.usageCount`:
+
+```typescript
+function getRarity(usageCount: number): Rarity {
+  if (usageCount >= 50) return 'legendary';
+  if (usageCount >= 20) return 'epic';
+  if (usageCount >= 5) return 'rare';
+  return 'common';
+}
+```
+
+**Rationale:** Keeps data normalized, ensures consistency, easy to adjust tiers.
+
+## Data Flow (Updated for Card Collection)
+
+1. **User Action** → Store method (e.g., `addInstrument()`, `createDeck()`)
 2. **Store Update** → Zustand state change
 3. **Persistence** → LocalStorage auto-save (via Zustand persist middleware)
-4. **Canvas Sync** → `syncWithInstruments()` updates React Flow nodes
-5. **UI Update** → React re-renders
+4. **UI Update** → React re-renders collection grid
+5. **Animation** → Card entrance/update animations play
 
 ## Persistence Strategy
 
@@ -103,10 +136,12 @@ Groups contain references to instruments, but instruments don't reference groups
 
 - **Format:** JSON serialization via Zustand persist middleware
 - **Keys:** 
-  - `instrument-storage`
-  - `group-storage`
-  - `template-storage`
-  - `ui-storage` (filters, search state)
+  - `instrument-storage` (active)
+  - `deck-storage` (NEW - active)
+  - `ui-storage` (active - filters, search, collection view state)
+  - `group-storage` (legacy - migrated to decks)
+  - `template-storage` (legacy - migrated to decks)
+  - `canvas-storage` (legacy - ignored)
 - **Limitations:** 5-10MB limit, synchronous, no queries
 
 ### Future: IndexedDB Migration
@@ -142,13 +177,54 @@ const defaultColors = {
 ### New Instrument Defaults
 
 - `id`: Generated UUID
-- `position`: Random position (0-800, 0-600)
+- `position`: `{ x: 0, y: 0 }` (kept for backward compatibility, not used in card UI)
 - `pairings`: Empty array
 - `color`: Based on category
 - `metadata.usageCount`: 0
 - `metadata.createdAt`: Current date
 
+### New Deck Defaults
+
+- `id`: Generated UUID
+- `instruments`: Selected instrument IDs
+- `color`: `#3b82f6` (default blue)
+- `icon`: `🎹` (default keyboard emoji)
+- `metadata.usageCount`: 0
+- `metadata.createdAt`: Current date
+
 ## Migration Considerations
+
+### Card Collection Migration (v2.0)
+
+**From:** Canvas-based interface with Templates and Groups  
+**To:** Card collection interface with Decks
+
+**Migration Steps:**
+1. Check if `template-storage` or `group-storage` exist
+2. Convert Templates → Decks (drop `layout` field)
+3. Convert Groups → Decks (already similar structure)
+4. Save to `deck-storage`
+5. Archive legacy data with `-backup` suffix
+6. Show user notification about migration
+
+**Migration Function:**
+```typescript
+function migrateToCards() {
+  const templates = readFromStorage('template-storage');
+  const groups = readFromStorage('group-storage');
+  
+  const decks = [
+    ...templates.map(convertTemplateToDeck),
+    ...groups.map(convertGroupToDeck),
+  ];
+  
+  saveToStorage('deck-storage', { decks });
+  archiveLegacyData(['template-storage', 'group-storage']);
+  showMigrationToast();
+}
+```
+
+### IndexedDB Migration (Future)
 
 When migrating to IndexedDB:
 1. Read all LocalStorage keys
@@ -156,4 +232,9 @@ When migrating to IndexedDB:
 3. Batch insert
 4. Verify data integrity
 5. Clear LocalStorage after successful migration
+
+**Triggers:**
+- Library exceeds 500 instruments
+- Performance degrades
+- User opts in for better performance
 

@@ -45,7 +45,7 @@ const checks = [
 ];
 
 console.log('\n🔍 Running pre-push checks...\n');
-console.log('='.repeat(60) + '\n');
+console.log('=' . repeat(60) + '\n');
 
 let allPassed = true;
 let criticalFailed = false;

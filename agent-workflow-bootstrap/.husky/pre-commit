@@ -5,17 +5,14 @@ echo "🔍 Running pre-commit checks..."
 
 # Validate branch name (skip for main branches)
 BRANCH=$(git branch --show-current)
-if [ "$BRANCH" != "main" ] && [ "$BRANCH" != "master" ] && [ "$BRANCH" != "develop" ]; then
-  echo "📝 Validating branch name..."
+if [[ "$BRANCH" != "main" && "$BRANCH" != "master" && "$BRANCH" != "develop" ]]; then
   node scripts/validate-branch-name.js || exit 1
 fi
 
 # Run lint-staged for formatting and linting
-echo "✨ Linting staged files..."
 npx lint-staged || exit 1
 
 # Type check
-echo "🔎 Running TypeScript type check..."
 npm run type-check || exit 1
 
 echo "✅ Pre-commit checks passed"

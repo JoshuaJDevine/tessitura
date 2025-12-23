@@ -108,20 +108,20 @@ This project follows a self-documenting architecture:
 
 ## Development Workflow
 
-This project uses an **Agent Cascade Workflow** for feature development:
+This project uses a **5-Agent Cascade Workflow** for feature development:
 
 ```
-@architect → @coder → @test → @docs
+@designer → @coder → @tester → @documenter → @closer → PR
 ```
 
-Each agent generates the prompt for the next, ensuring consistent quality and complete documentation.
+Each agent has specific responsibilities, blockers, and generates a handoff prompt for the next agent.
 
 **Start a new feature:**
 ```bash
 npm run feature:start
 ```
 
-**See [AGENT-CASCADE.md](AGENT-CASCADE.md) for complete workflow guide.**
+**See [.cursor/WORKFLOW.md](.cursor/WORKFLOW.md) for complete workflow guide.**
 
 ## Testing
 
@@ -140,13 +140,14 @@ npm run feature:start
 
 ## Contributing
 
-1. Run `npm run feature:start` to begin
-2. Follow the agent cascade workflow (@architect → @coder → @test → @docs)
-3. @docs agent formats, validates, and pushes to GitHub
-4. Engineer creates PR on GitHub
-5. Wait for CI/CD to pass
-6. Merge via GitHub's interface (never merge locally)
-7. Run `npm run feature:complete` to archive and cleanup
+1. Run `npm run feature:start` to create branch and feature folder
+2. Invoke `@designer` with your feature idea
+3. Follow the cascade: @designer → @coder → @tester → @documenter → @closer
+4. Each agent creates a handoff document for the next
+5. @closer runs all checks, formats code, and creates PR
+6. Engineer reviews PR on GitHub
+7. Merge via GitHub's interface (never merge locally)
+8. Run `npm run feature:complete` to archive and cleanup
 
 ## License
 

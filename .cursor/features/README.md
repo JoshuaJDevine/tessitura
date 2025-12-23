@@ -1,14 +1,21 @@
 # Feature Lifecycle Tracking
 
-This directory tracks features as they progress through the development workflow.
+This directory tracks features as they progress through the 5-agent development workflow.
 
 ## Structure
 
 ```
 .cursor/features/
-├── active/          # Features currently in development
-├── completed/       # Archived completed features
-└── README.md        # This file
+├── active/           # Features currently in development
+│   └── <feature>/    # Each feature gets its own folder
+│       ├── README.md
+│       ├── designer.md
+│       ├── coder.md
+│       ├── tester.md
+│       ├── documenter.md
+│       └── closer.md
+├── completed/        # Archived completed features
+└── README.md         # This file
 ```
 
 ## Workflow
@@ -20,97 +27,77 @@ npm run feature:start
 ```
 
 This will:
-- Prompt you for feature details
-- Create a new feature branch
-- Create a feature lifecycle file in `active/`
-- Guide you through the next steps
+- Checkout main and pull latest
+- Create a new feature branch (`feature/<name>`)
+- Create a feature folder in `active/`
+- Guide you to invoke @designer
 
-### 2. Follow the Cascade
+### 2. Follow the 5-Agent Cascade
 
 Each feature goes through these phases:
 
-**Phase 1: Architecture** (`@architect`)
-- Review requirements
-- Create implementation plan
-- Make architecture decisions
-- Generate prompt for @coder
+| Phase | Agent | Responsibility | Handoff |
+|-------|-------|----------------|---------|
+| 1 | **@designer** | Requirements, ADR, branch setup | → @coder prompt |
+| 2 | **@coder** | Implementation, commits | → @tester prompt |
+| 3 | **@tester** | Tests, 80%+ coverage | → @documenter prompt |
+| 4 | **@documenter** | .md files for all code | → @closer prompt |
+| 5 | **@closer** | Validation, PR creation | → Human review |
 
-**Phase 2: Implementation** (`@coder`)
-- Follow architecture plan
-- Implement the feature
-- Commit code changes
-- Generate prompt for @test
+**Key:** Each agent creates a handoff document with the prompt for the next agent.
 
-**Phase 3: Testing** (`@test`)
-- Write comprehensive test coverage
-- Ensure 80%+ coverage minimum
-- Test behavior, not implementation
-- Commit tests
-- Generate prompt for @docs
+### 3. Agent Documents
 
-**Phase 4: Documentation** (`@docs`)
-- Update all affected .md files
-- Document test coverage
-- Update examples and usage
-- Update timestamps
-- Commit documentation
+Each agent writes to their own file in the feature folder:
 
-**Phase 5: Review & Push**
-- Run pre-commit checks
-- Verify test coverage
-- Manual testing
-- Push to GitHub
-- Create PR
+- `designer.md` - Requirements, ADR reference, @coder prompt
+- `coder.md` - Implementation notes, files changed, @tester prompt
+- `tester.md` - Test summary, coverage, @documenter prompt
+- `documenter.md` - Docs created, @closer prompt
+- `closer.md` - PR link, issues created, final checklist
 
-### 3. Complete a Feature
+### 4. Complete a Feature
+
+After PR is merged via GitHub:
 
 ```bash
 npm run feature:complete
 ```
 
-This archives the feature file to `completed/` and provides push instructions.
+This archives the feature folder to `completed/` and provides cleanup instructions.
 
-## Agent Cascade Pattern
+## Agent Definitions
 
-The key is that **each agent generates the prompt for the next agent**:
+Full agent personalities, blockers, and handoff templates are in:
+- `.cursor/agents/designer.md`
+- `.cursor/agents/coder.md`
+- `.cursor/agents/tester.md`
+- `.cursor/agents/documenter.md`
+- `.cursor/agents/closer.md`
 
-```
-You: "I want to add zoom controls"
-     ↓
-@architect: "Here's the plan. @coder, implement this: [detailed prompt]"
-     ↓
-@coder: "Done! @test, write tests for this: [detailed prompt]"
-     ↓
-@test: "94% coverage achieved! @docs, update these files: [detailed prompt]"
-     ↓
-@docs: "Documentation updated. Ready for review."
-```
+## Quality Gates
 
-## Example Feature File
+Each agent has **blockers** that must be complete before proceeding:
 
-See `.cursor/templates/feature-template.md` for the structure.
-
-Each feature file contains:
-- Engineer's original request
-- Architecture decisions and plan
-- Implementation details
-- Documentation updates
-- Review checklist
+| Agent | Must Complete Before Handoff |
+|-------|------------------------------|
+| Designer | ADR created, clean branch from main |
+| Coder | Type-check passes, lint passes |
+| Tester | Tests pass, 80%+ coverage |
+| Documenter | .md file for every new code file |
+| Closer | All pre-push checks pass |
 
 ## Benefits
 
-1. **Context Preservation** - Everything about a feature in one place
-2. **Agent Coordination** - Each agent knows what the previous agent did
-3. **Quality Assurance** - All features have comprehensive test coverage
-4. **Traceability** - Complete history from idea → code → tests → docs
-5. **Learning** - Review completed features to see patterns
-6. **Onboarding** - New team members can see how features are built
+1. **No bloated files** - Each agent has their own document
+2. **Clear ownership** - Each agent knows exactly what they're responsible for
+3. **Enforced quality** - Blockers prevent skipping steps
+4. **Full traceability** - Complete history in feature folder
+5. **Easy onboarding** - Review completed features to learn patterns
 
 ## Tips
 
-- Keep one feature active at a time for clarity
-- Fill in each section completely before moving to next phase
-- The feature file is your source of truth
-- Don't push until all phases are complete
+- One feature at a time for clarity
+- Copy handoff prompts exactly - don't retype
 - Archive completed features for reference
-
+- Review completed features to improve process

@@ -1,15 +1,38 @@
 # Music Plugin Organizer - Development Rules
 
-## Agent Roles
+## Agent Workflow System
 
-This project uses multiple agent roles in a cascade workflow:
-- **@architect** - Architecture decisions and implementation planning
-- **@coder** - Implementation and feature development
-- **@test** - Test coverage and quality assurance
-- **@docs** - Documentation updates and maintenance
+This project uses a 5-agent cascade workflow. Each agent has specific responsibilities and cannot proceed without completing their blockers.
 
-See `AGENT-CASCADE.md` for the complete workflow guide.
-See `.cursorrules-test` for detailed @test agent instructions.
+### Available Agents
+- **@designer** - Requirements clarification, ADRs, branch creation, pushback on unclear ideas
+- **@coder** - Implementation following the design
+- **@tester** - Test coverage (80%+ on new code)
+- **@documenter** - Documentation for all code files
+- **@closer** - Final validation, formatting, PR creation, GitHub issues for gaps
+
+### Agent Definitions
+Full agent definitions with personalities, blockers, and handoff templates are in:
+- `.cursor/agents/designer.md`
+- `.cursor/agents/coder.md`
+- `.cursor/agents/tester.md`
+- `.cursor/agents/documenter.md`
+- `.cursor/agents/closer.md`
+
+### Workflow Documentation
+See `.cursor/WORKFLOW.md` for the complete workflow guide.
+
+### Feature Folder Structure
+Each feature gets its own folder with per-agent documents:
+```
+.cursor/features/active/<feature-name>/
+├── README.md        # Feature tracking
+├── designer.md      # Requirements, ADR ref, coder prompt
+├── coder.md         # Implementation notes, tester prompt
+├── tester.md        # Test summary, documenter prompt
+├── documenter.md    # Doc summary, closer prompt
+└── closer.md        # PR link, issues created
+```
 
 ## 🚨 Critical Git Rules
 
@@ -331,61 +354,72 @@ Keep these in mind when making architectural decisions.
 
 ### Agent-Specific Instructions
 
-#### @architect Agent:
-When reviewing architecture:
-1. Analyze requirements thoroughly
-2. Make architecture decisions with rationale
-3. Create detailed implementation plan
-4. Check if decision warrants an ADR
-5. Generate specific @coder prompt
-6. Update architecture documentation
-7. Consider future migration paths
+**See full agent definitions in `.cursor/agents/` for complete details.**
+
+#### @designer Agent:
+1. Ask probing questions - push back on vague requirements
+2. Create/update ADR in `docs/architecture/decisions.md`
+3. Set up clean branch from latest main
+4. Create designer handoff with @coder prompt
+5. **Blockers:** Cannot proceed without ADR and clean branch
 
 #### @coder Agent:
-When implementing features:
-1. Follow the architecture plan exactly
-2. Read related .md files for context
-3. Follow TypeScript strict mode
-4. Add JSDoc comments
-5. Keep files under size limits
-6. Generate specific @test prompt with implementation details
+1. Follow the designer's plan exactly
+2. Make atomic commits with conventional messages
+3. Pass type-check and lint before completing
+4. Create coder handoff with @tester prompt
+5. **Blockers:** Cannot proceed without passing quality checks
 
-#### @test Agent:
-When writing tests:
-1. Analyze the implementation
-2. Write comprehensive test coverage (80%+ minimum)
-3. Follow testing best practices (see `.cursorrules-test`)
-4. Test behavior, not implementation
-5. Generate specific @docs prompt with testing details
+#### @tester Agent:
+1. Write tests for all new code files
+2. Achieve 80%+ coverage on new code
+3. Test behavior, not implementation details
+4. Create tester handoff with @documenter prompt
+5. **Blockers:** Cannot proceed without passing tests and coverage
 
-#### @docs Agent:
-When updating documentation:
-1. Read the code and test files
-2. Update corresponding .md files
-3. Document test coverage
-4. Ensure examples are current
-5. Update "Last Updated" with date and reason
-6. Verify all sections are complete
-7. **Pre-Push Steps (Agent Executes):**
-   - Run `npm run format` to format all code
-   - Run `npm run pre-push` to verify all CI checks pass
-   - Commit any formatting changes
-   - Push branch to GitHub: `git push -u origin feature/name`
-8. **Final Instruction to Engineer:**
-   - "Branch pushed to GitHub: [URL]"
-   - "Create PR, wait for CI, merge via GitHub interface"
-   - "After merge, run: npm run feature:complete"
-9. **NEVER merge to main locally** - always create PR on GitHub
+#### @documenter Agent:
+1. Create .md file for every new code file
+2. Update architecture docs if needed
+3. Include working examples
+4. Create documenter handoff with @closer prompt
+5. **Blockers:** Cannot proceed without all docs created
+
+#### @closer Agent:
+1. Run `npm run pre-push` - all checks must pass
+2. Run `npm run format` - format all code
+3. Create GitHub issues for any gaps (`npm run create-issue`)
+4. Push branch and create PR
+5. Create closer handoff with PR link
+6. **NEVER merge to main locally** - always use GitHub
 
 ### Quick Reference
 
 #### Common Commands:
 ```bash
+# Development
 npm run dev                 # Start development server
 npm run electron:dev        # Start Electron app
+
+# Feature Workflow
+npm run feature:start       # Start new feature (branch + folder)
+npm run feature:complete    # Archive completed feature
+
+# Quality Checks
+npm run pre-push            # Run ALL quality checks
+npm run validate:branch     # Validate branch naming
 npm run docs:validate       # Check documentation completeness
 npm run type-check          # Run TypeScript compiler
 npm run lint                # Run ESLint
+npm run format              # Format code with Prettier
+
+# GitHub Integration
+npm run create-issue        # Create GitHub issue for gaps
+
+# Testing
+npm test                    # Run tests
+npm run test:coverage       # Run tests with coverage
+
+# Build
 npm run build               # Build for production
 ```
 

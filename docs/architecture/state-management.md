@@ -1,10 +1,16 @@
 # State Management Architecture
 
-**Last Updated:** 2024-12-19
+**Last Updated:** 2024-12-22 - Card collection pivot, added DeckStore
 
 ## Overview
 
 The application uses Zustand for state management with a multi-store architecture. Each store manages a specific domain of state.
+
+**⚠️ Major Changes (2024-12-22):**
+- Added **DeckStore** (replaces TemplateStore and GroupStore)
+- Updated **InstrumentStore** with usage tracking methods
+- Updated **UIStore** for collection view state
+- **CanvasStore** moved to legacy (kept for reference)
 
 ## Store Architecture
 
@@ -28,34 +34,48 @@ The application uses Zustand for state management with a multi-store architectur
 - `createPairing()` - Create bidirectional pairing
 - `removePairing()` - Remove pairing
 - `markAsUsed()` - Update usage metadata
+- `incrementUsage()` - **NEW:** Increment usage count and update lastUsed
+- `getInstrumentsByRarity()` - **NEW:** Get instruments grouped by rarity tier
+- `getRandomUnderused()` - **NEW:** Get random instruments with low usage for discovery
 
 **Persistence:** LocalStorage key `instrument-storage`
 
-### CanvasStore
+### DeckStore (NEW)
 
-**File:** `src/store/canvasStore.ts`  
-**Purpose:** Manages React Flow canvas state (nodes, edges, selection)
+**File:** `src/store/deckStore.ts`  
+**Purpose:** Manages instrument decks (curated collections for specific workflows)
+
+**Status:** ✅ Active (Replaces TemplateStore and GroupStore)
 
 **State:**
 ```typescript
 {
-  nodes: Node[]
-  edges: Edge[]
-  selectedNodeIds: string[]
+  decks: Deck[]
+  activeDeckId: string | null
 }
 ```
 
 **Actions:**
-- `onNodesChange()` - Handle React Flow node changes
-- `onEdgesChange()` - Handle React Flow edge changes
-- `onConnect()` - Handle new connections
-- `setSelectedNodeIds()` - Update selection
-- `updateNodePosition()` - Update node position
-- `syncWithInstruments()` - Sync nodes from instruments
-- `syncWithGroups()` - Sync group nodes
-- `getConnectedNodeIds()` - Get connected node IDs
+- `createDeck()` - Create new deck
+- `updateDeck()` - Update existing deck
+- `deleteDeck()` - Delete deck
+- `addInstrumentsToDeck()` - Add instruments to deck
+- `removeInstrumentFromDeck()` - Remove instrument from deck
+- `setActiveDeck()` - Set currently active deck
+- `useDeck()` - Mark deck as used (increment usage count, update lastUsed)
+- `getDeckById()` - Get deck by ID
+- `getDecksForInstrument()` - Get all decks containing an instrument
 
-**Persistence:** None (derived from instruments)
+**Persistence:** LocalStorage key `deck-storage`
+
+### CanvasStore (LEGACY)
+
+**File:** `src/store/canvasStore.ts`  
+**Purpose:** Managed React Flow canvas state (nodes, edges, selection)
+
+**Status:** ⚠️ Legacy (Moved to `legacy/canvasStore.ts`, kept for reference)
+
+**Note:** Canvas interface replaced by card-based collection view. Store kept for historical reference and potential future spatial features.
 
 ### UIStore
 
@@ -73,6 +93,11 @@ The application uses Zustand for state management with a multi-store architectur
   isEditInstrumentOpen: boolean
   editingInstrumentId: string | null
   suggestedInstrumentId: string | null
+  collectionView: {
+    sortBy: 'name' | 'recent' | 'most-used' | 'least-used' | 'category'
+    viewDensity: 'compact' | 'spacious'
+    selectedCardIds: string[]
+  }
 }
 ```
 
@@ -85,56 +110,34 @@ The application uses Zustand for state management with a multi-store architectur
 - `openAddInstrument()` / `closeAddInstrument()` - Modal control
 - `openEditInstrument()` / `closeEditInstrument()` - Edit modal control
 - `setSuggestedInstrument()` - Set highlighted suggestion
+- `setCollectionSort()` - **NEW:** Set sort order for collection view
+- `setViewDensity()` - **NEW:** Set card density (compact/spacious)
+- `toggleCardSelection()` - **NEW:** Toggle card selection state
+- `clearSelection()` - **NEW:** Clear all selected cards
 
-**Persistence:** Optional (can persist filters)
+**Persistence:** LocalStorage key `ui-storage` (includes collection view preferences)
 
-### GroupStore
+### GroupStore (LEGACY)
 
-**File:** `src/store/groupStore.ts`  
-**Purpose:** Manages instrument groups
+**File:** `legacy/groupStore.ts`  
+**Purpose:** Managed instrument groups (visual containers on canvas)
 
-**State:**
-```typescript
-{
-  groups: InstrumentGroup[]
-}
-```
+**Status:** ⚠️ Superseded by DeckStore
 
-**Actions:**
-- `addGroup()` - Create new group
-- `updateGroup()` - Update group
-- `deleteGroup()` - Delete group
-- `getGroup()` - Get group by ID
-- `toggleGroupCollapse()` - Toggle collapse state
-- `addInstrumentToGroup()` - Add instrument to group
-- `removeInstrumentFromGroup()` - Remove instrument from group
+**Persistence:** LocalStorage key `group-storage` (will be migrated to decks)
 
-**Persistence:** LocalStorage key `group-storage`
+### TemplateStore (LEGACY)
 
-### TemplateStore
+**File:** `legacy/templateStore.ts`  
+**Purpose:** Managed workflow templates (saved canvas layouts)
 
-**File:** `src/store/templateStore.ts`  
-**Purpose:** Manages workflow templates
+**Status:** ⚠️ Superseded by DeckStore
 
-**State:**
-```typescript
-{
-  templates: Template[]
-}
-```
-
-**Actions:**
-- `addTemplate()` - Create template from selection
-- `updateTemplate()` - Update template
-- `deleteTemplate()` - Delete template
-- `getTemplate()` - Get template by ID
-- `loadTemplate()` - Load template onto canvas
-
-**Persistence:** LocalStorage key `template-storage`
+**Persistence:** LocalStorage key `template-storage` (will be migrated to decks)
 
 ## State Flow
 
-### Adding an Instrument
+### Adding an Instrument (Updated for Card Collection)
 
 ```
 User fills form → AddInstrument.tsx
@@ -145,43 +148,81 @@ Zustand state update
   ↓
 LocalStorage persistence (auto)
   ↓
-Canvas sync (useEffect in Canvas.tsx)
+CollectionView.tsx re-renders
   ↓
-React Flow nodes update
+New InstrumentCard appears in grid
   ↓
-UI re-renders
+"Card pack opening" animation plays
 ```
 
-### Creating a Pairing
+### Creating a Deck (New Flow)
 
 ```
-User selects nodes → ContextMenu
+User selects multiple cards → InstrumentCard (selection mode)
   ↓
-instrumentStore.createPairing(id1, id2)
+uiStore.toggleCardSelection(id) for each card
   ↓
-Both instruments' pairings arrays updated
+"Create Deck" button appears (2+ selected)
   ↓
-Canvas sync detects new pairings
+User clicks "Create Deck"
   ↓
-React Flow edge created
+deckStore.createDeck({ name, instruments: selectedIds })
   ↓
-UI updates with connection line
+Zustand state update + LocalStorage persistence
+  ↓
+Sidebar.tsx DeckLibrary section updates
+  ↓
+New deck appears in sidebar list
 ```
 
-### Filtering
+### Using an Instrument (Updated with Usage Tracking)
+
+```
+User double-clicks card → InstrumentCard
+  ↓
+instrumentStore.incrementUsage(id)
+  ↓
+usageCount++, lastUsed = now
+  ↓
+Rarity tier recalculated
+  ↓
+Card visual effect updates (e.g., Common → Rare → Epic → Legendary)
+  ↓
+UI re-renders with new shimmer/glow effect
+```
+
+### Discovery Flow (New - "Surprise Me")
+
+```
+User clicks "Surprise Me" → CollectionHeader
+  ↓
+instrumentStore.getRandomUnderused(3)
+  ↓
+Filters to instruments with usageCount < 5
+  ↓
+Selects 3 random instruments
+  ↓
+DiscoveryModal opens with spotlight cards
+  ↓
+User can "Add to New Deck" or "Not Interested"
+  ↓
+If "Add to New Deck": deckStore.createDeck()
+```
+
+### Filtering (Updated for Collection View)
 
 ```
 User changes filter → FilterPanel.tsx
   ↓
 uiStore.toggleTag() / toggleCategory() / etc.
   ↓
-Canvas.tsx reads filters from uiStore
+CollectionView.tsx reads filters from uiStore
   ↓
-Nodes filtered based on criteria
+Cards filtered based on criteria
   ↓
-Hidden nodes removed from view
+Stagger animation for remaining cards
   ↓
-UI updates
+UI updates with smooth transitions
 ```
 
 ## Persistence Strategy

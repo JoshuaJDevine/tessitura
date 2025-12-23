@@ -4,9 +4,7 @@
  * Start Feature Script
  *
  * Creates a new feature branch and initializes the feature folder structure.
- * This is typically invoked at the start of a feature, before the Designer agent.
- *
- * New workflow: Each feature gets a folder with per-agent documents.
+ * This is typically invoked by the Designer agent at the start of a feature.
  */
 
 import { writeFileSync, mkdirSync, existsSync, readdirSync } from 'fs';
@@ -42,6 +40,14 @@ function checkGitStatus() {
   try {
     const status = execSync('git status --porcelain', { encoding: 'utf-8' });
     return status.trim();
+  } catch {
+    return null;
+  }
+}
+
+function getCurrentBranch() {
+  try {
+    return execSync('git branch --show-current', { encoding: 'utf-8' }).trim();
   } catch {
     return null;
   }
