@@ -18,6 +18,8 @@
     "docs:validate": "node scripts/validate-docs.js",
     "docs:prompt": "node scripts/generate-doc-prompt.js",
     "docs:check": "node scripts/check-docs.js",
+    "feature:start": "node scripts/start-feature.js",
+    "feature:complete": "node scripts/complete-feature.js",
     "prepare": "husky"
   },
   "keywords": [

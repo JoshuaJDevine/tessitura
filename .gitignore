@@ -43,3 +43,5 @@ Thumbs.db
 # Cursor
 .cursor/doc-tasks.md
 .cursor/doc-prompt.txt
+.cursor/features/active/
+.cursor/features/completed/
