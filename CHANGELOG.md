@@ -23,6 +23,7 @@ All notable changes to this project will be documented in this file.
 - Dark theme UI with Tailwind CSS and shadcn/ui
 - Self-documenting architecture with component-level .md files
 - Architecture documentation (ADRs, data model, state management)
+- **Comprehensive test suite:** 202 tests achieving 80%+ code coverage across all critical business logic
 
 ### Technical
 - TypeScript strict mode enabled
@@ -30,6 +31,7 @@ All notable changes to this project will be documented in this file.
 - React Flow for canvas visualization
 - Electron for desktop app with filesystem access
 - Modular file structure with documentation
+- **Vitest + React Testing Library:** 85% line coverage, 90% function coverage with 202 tests
 
 ## [Future]
 
