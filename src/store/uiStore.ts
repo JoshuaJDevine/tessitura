@@ -1,6 +1,12 @@
 import { create } from 'zustand';
 import { Category, Host } from '@/types';
 
+interface CollectionViewState {
+  sortBy: 'name' | 'recent' | 'category' | 'developer';
+  viewDensity: 'compact' | 'spacious';
+  selectedCardIds: string[];
+}
+
 interface UIStore {
   searchQuery: string;
   selectedTags: string[];
@@ -10,6 +16,7 @@ interface UIStore {
   isEditInstrumentOpen: boolean;
   editingInstrumentId: string | null;
   suggestedInstrumentId: string | null;
+  collectionView: CollectionViewState;
   setSearchQuery: (query: string) => void;
   toggleTag: (tag: string) => void;
   toggleCategory: (category: Category) => void;
@@ -20,6 +27,10 @@ interface UIStore {
   openEditInstrument: (id: string) => void;
   closeEditInstrument: () => void;
   setSuggestedInstrument: (id: string | null) => void;
+  setCollectionSort: (sortBy: CollectionViewState['sortBy']) => void;
+  setViewDensity: (density: CollectionViewState['viewDensity']) => void;
+  toggleCardSelection: (id: string) => void;
+  clearSelection: () => void;
 }
 
 export const useUIStore = create<UIStore>((set) => ({
@@ -31,6 +42,11 @@ export const useUIStore = create<UIStore>((set) => ({
   isEditInstrumentOpen: false,
   editingInstrumentId: null,
   suggestedInstrumentId: null,
+  collectionView: {
+    sortBy: 'name',
+    viewDensity: 'spacious',
+    selectedCardIds: [],
+  },
 
   setSearchQuery: (query) => set({ searchQuery: query }),
 
@@ -70,4 +86,29 @@ export const useUIStore = create<UIStore>((set) => ({
   closeEditInstrument: () => set({ isEditInstrumentOpen: false, editingInstrumentId: null }),
 
   setSuggestedInstrument: (id) => set({ suggestedInstrumentId: id }),
+
+  setCollectionSort: (sortBy) =>
+    set((state) => ({
+      collectionView: { ...state.collectionView, sortBy },
+    })),
+
+  setViewDensity: (density) =>
+    set((state) => ({
+      collectionView: { ...state.collectionView, viewDensity: density },
+    })),
+
+  toggleCardSelection: (id) =>
+    set((state) => {
+      const selectedCardIds = state.collectionView.selectedCardIds.includes(id)
+        ? state.collectionView.selectedCardIds.filter((cardId) => cardId !== id)
+        : [...state.collectionView.selectedCardIds, id];
+      return {
+        collectionView: { ...state.collectionView, selectedCardIds },
+      };
+    }),
+
+  clearSelection: () =>
+    set((state) => ({
+      collectionView: { ...state.collectionView, selectedCardIds: [] },
+    })),
 }));
