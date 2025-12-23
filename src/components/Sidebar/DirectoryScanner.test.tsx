@@ -29,14 +29,14 @@ describe('DirectoryScanner', () => {
       expect(wrapper.className).toContain('p-4');
     });
 
-    it('should render the scan directory button', () => {
+    it('should render the choose directory button', () => {
       render(<DirectoryScanner />);
-      expect(screen.getByText('Scan Directory')).toBeInTheDocument();
+      expect(screen.getByText('Choose Directory')).toBeInTheDocument();
     });
 
     it('should disable button when electronAPI is not available', () => {
       render(<DirectoryScanner />);
-      const button = screen.getByRole('button', { name: /scan directory/i });
+      const button = screen.getByRole('button', { name: /choose directory/i });
       expect(button).toBeDisabled();
     });
 
@@ -47,7 +47,7 @@ describe('DirectoryScanner', () => {
       };
 
       render(<DirectoryScanner />);
-      const button = screen.getByRole('button', { name: /scan directory/i });
+      const button = screen.getByRole('button', { name: /choose directory/i });
       expect(button).not.toBeDisabled();
     });
   });
@@ -55,7 +55,7 @@ describe('DirectoryScanner', () => {
   describe('handleScan', () => {
     it('should not trigger scan when electronAPI is not available', () => {
       render(<DirectoryScanner />);
-      const button = screen.getByRole('button', { name: /scan directory/i });
+      const button = screen.getByRole('button', { name: /choose directory/i });
 
       // Button should be disabled when electron API not available
       expect(button).toBeDisabled();
@@ -70,7 +70,7 @@ describe('DirectoryScanner', () => {
       };
 
       render(<DirectoryScanner />);
-      const button = screen.getByRole('button', { name: /scan directory/i });
+      const button = screen.getByRole('button', { name: /choose directory/i });
 
       fireEvent.click(button);
 
@@ -97,7 +97,7 @@ describe('DirectoryScanner', () => {
       };
 
       render(<DirectoryScanner />);
-      const button = screen.getByRole('button', { name: /scan directory/i });
+      const button = screen.getByRole('button', { name: /choose directory/i });
 
       fireEvent.click(button);
 
@@ -121,7 +121,7 @@ describe('DirectoryScanner', () => {
       };
 
       render(<DirectoryScanner />);
-      const button = screen.getByRole('button', { name: /scan directory/i });
+      const button = screen.getByRole('button', { name: /choose directory/i });
 
       fireEvent.click(button);
 
@@ -143,7 +143,7 @@ describe('DirectoryScanner', () => {
       };
 
       render(<DirectoryScanner />);
-      const button = screen.getByRole('button', { name: /scan directory/i });
+      const button = screen.getByRole('button', { name: /choose directory/i });
 
       fireEvent.click(button);
 
@@ -170,7 +170,7 @@ describe('DirectoryScanner', () => {
       };
 
       render(<DirectoryScanner />);
-      const button = screen.getByRole('button', { name: /scan directory/i });
+      const button = screen.getByRole('button', { name: /choose directory/i });
 
       fireEvent.click(button);
 
@@ -199,7 +199,7 @@ describe('DirectoryScanner', () => {
       };
 
       render(<DirectoryScanner />);
-      fireEvent.click(screen.getByRole('button', { name: /scan directory/i }));
+      fireEvent.click(screen.getByRole('button', { name: /choose directory/i }));
 
       await waitFor(() => {
         expect(screen.getByText('BBC Symphony Orchestra')).toBeInTheDocument();
@@ -220,7 +220,7 @@ describe('DirectoryScanner', () => {
       };
 
       render(<DirectoryScanner />);
-      fireEvent.click(screen.getByRole('button', { name: /scan directory/i }));
+      fireEvent.click(screen.getByRole('button', { name: /choose directory/i }));
 
       await waitFor(() => {
         expect(screen.getByText('Pigments')).toBeInTheDocument();
@@ -241,7 +241,7 @@ describe('DirectoryScanner', () => {
       };
 
       render(<DirectoryScanner />);
-      fireEvent.click(screen.getByRole('button', { name: /scan directory/i }));
+      fireEvent.click(screen.getByRole('button', { name: /choose directory/i }));
 
       await waitFor(() => {
         expect(screen.getByText('SomeSynth')).toBeInTheDocument();
@@ -271,7 +271,7 @@ describe('DirectoryScanner', () => {
       };
 
       render(<DirectoryScanner />);
-      fireEvent.click(screen.getByRole('button', { name: /scan directory/i }));
+      fireEvent.click(screen.getByRole('button', { name: /choose directory/i }));
 
       await waitFor(
         () => {
@@ -314,7 +314,7 @@ describe('DirectoryScanner', () => {
       };
 
       render(<DirectoryScanner />);
-      fireEvent.click(screen.getByRole('button', { name: /scan directory/i }));
+      fireEvent.click(screen.getByRole('button', { name: /choose directory/i }));
 
       await waitFor(
         () => {
@@ -340,7 +340,7 @@ describe('DirectoryScanner', () => {
       };
 
       render(<DirectoryScanner />);
-      fireEvent.click(screen.getByRole('button', { name: /scan directory/i }));
+      fireEvent.click(screen.getByRole('button', { name: /choose directory/i }));
 
       await waitFor(
         () => {
@@ -387,7 +387,7 @@ describe('DirectoryScanner', () => {
       };
 
       render(<DirectoryScanner />);
-      fireEvent.click(screen.getByRole('button', { name: /scan directory/i }));
+      fireEvent.click(screen.getByRole('button', { name: /choose directory/i }));
 
       await waitFor(() => {
         expect(screen.getByText('Test Instrument')).toBeInTheDocument();
@@ -421,7 +421,7 @@ describe('DirectoryScanner', () => {
       };
 
       render(<DirectoryScanner />);
-      fireEvent.click(screen.getByRole('button', { name: /scan directory/i }));
+      fireEvent.click(screen.getByRole('button', { name: /choose directory/i }));
 
       await waitFor(() => {
         expect(screen.getByText('Import Instruments')).toBeInTheDocument();
@@ -456,7 +456,7 @@ describe('DirectoryScanner', () => {
       };
 
       render(<DirectoryScanner />);
-      fireEvent.click(screen.getByRole('button', { name: /scan directory/i }));
+      fireEvent.click(screen.getByRole('button', { name: /choose directory/i }));
 
       await waitFor(
         () => {
@@ -491,7 +491,7 @@ describe('DirectoryScanner', () => {
       };
 
       render(<DirectoryScanner />);
-      fireEvent.click(screen.getByRole('button', { name: /scan directory/i }));
+      fireEvent.click(screen.getByRole('button', { name: /choose directory/i }));
 
       await waitFor(() => {
         expect(screen.getByText('Import Instruments')).toBeInTheDocument();
@@ -520,7 +520,7 @@ describe('DirectoryScanner', () => {
       };
 
       render(<DirectoryScanner />);
-      fireEvent.click(screen.getByRole('button', { name: /scan directory/i }));
+      fireEvent.click(screen.getByRole('button', { name: /choose directory/i }));
 
       await waitFor(() => {
         expect(screen.getByText('Import Instruments')).toBeInTheDocument();
@@ -532,6 +532,333 @@ describe('DirectoryScanner', () => {
       await waitFor(() => {
         expect(screen.queryByText('Import Instruments')).not.toBeInTheDocument();
       });
+    });
+  });
+
+  describe('auto-scan functionality', () => {
+    it('should render auto-scan button', () => {
+      (window as any).electronAPI = {
+        selectDirectory: vi.fn(),
+        scanDirectory: vi.fn(),
+      };
+
+      render(<DirectoryScanner />);
+      expect(screen.getByRole('button', { name: /Scan Directories/i })).toBeInTheDocument();
+    });
+
+    it('should disable auto-scan button when electronAPI is not available', () => {
+      render(<DirectoryScanner />);
+      const button = screen.getByRole('button', { name: /Scan Directories/i });
+      expect(button).toBeDisabled();
+    });
+
+    it('should enable auto-scan button when electronAPI is available', () => {
+      (window as any).electronAPI = {
+        selectDirectory: vi.fn(),
+        scanDirectory: vi.fn(),
+      };
+
+      render(<DirectoryScanner />);
+      const button = screen.getByRole('button', { name: /Scan Directories/i });
+      expect(button).not.toBeDisabled();
+    });
+
+    it('should show progress dialog during auto-scan', async () => {
+      const mockScanDirectory = vi.fn().mockResolvedValue([
+        { name: 'Plugin1.vst3', path: 'C:\\VST3\\Plugin1.vst3', isDirectory: false },
+        { name: 'Plugin2.vst3', path: 'C:\\VST3\\Plugin2.vst3', isDirectory: false },
+      ]);
+
+      (window as any).electronAPI = {
+        selectDirectory: vi.fn(),
+        scanDirectory: mockScanDirectory,
+      };
+
+      render(<DirectoryScanner />);
+      const button = screen.getByRole('button', { name: /Scan Directories/i });
+      fireEvent.click(button);
+
+      await waitFor(() => {
+        expect(screen.getByText('Scanning Directories')).toBeInTheDocument();
+      });
+    });
+
+    it('should scan default VST3 paths', async () => {
+      const mockScanDirectory = vi.fn().mockResolvedValue([
+        {
+          name: 'Plugin1.vst3',
+          path: 'C:\\Program Files\\Common Files\\VST3\\Plugin1.vst3',
+          isDirectory: false,
+        },
+      ]);
+
+      (window as any).electronAPI = {
+        selectDirectory: vi.fn(),
+        scanDirectory: mockScanDirectory,
+      };
+
+      render(<DirectoryScanner />);
+      const button = screen.getByRole('button', { name: /Scan Directories/i });
+      fireEvent.click(button);
+
+      await waitFor(() => {
+        expect(mockScanDirectory).toHaveBeenCalled();
+      });
+    });
+
+    it('should show progress with path count and found count', async () => {
+      const mockScanDirectory = vi
+        .fn()
+        .mockResolvedValue([
+          { name: 'Plugin1.vst3', path: 'C:\\VST3\\Plugin1.vst3', isDirectory: false },
+        ]);
+
+      (window as any).electronAPI = {
+        selectDirectory: vi.fn(),
+        scanDirectory: mockScanDirectory,
+      };
+
+      render(<DirectoryScanner />);
+      const button = screen.getByRole('button', { name: /Scan Directories/i });
+      fireEvent.click(button);
+
+      await waitFor(() => {
+        expect(screen.getByText(/Path \d+ of \d+/)).toBeInTheDocument();
+        expect(screen.getByText(/\d+ plugins found/)).toBeInTheDocument();
+      });
+    });
+
+    it('should handle missing paths gracefully', async () => {
+      const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
+      const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      const mockScanDirectory = vi.fn().mockRejectedValue(new Error('Path not found'));
+
+      (window as any).electronAPI = {
+        selectDirectory: vi.fn(),
+        scanDirectory: mockScanDirectory,
+      };
+
+      render(<DirectoryScanner />);
+      const button = screen.getByRole('button', { name: /Scan Directories/i });
+      fireEvent.click(button);
+
+      await waitFor(() => {
+        expect(mockScanDirectory).toHaveBeenCalled();
+      });
+
+      // Should continue scanning other paths
+      await waitFor(
+        () => {
+          expect(consoleWarnSpy).toHaveBeenCalled();
+        },
+        { timeout: 2000 }
+      );
+
+      alertSpy.mockRestore();
+      consoleWarnSpy.mockRestore();
+    });
+
+    it('should show alert when no plugins found', async () => {
+      const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
+
+      const mockScanDirectory = vi.fn().mockResolvedValue([]);
+
+      (window as any).electronAPI = {
+        selectDirectory: vi.fn(),
+        scanDirectory: mockScanDirectory,
+      };
+
+      render(<DirectoryScanner />);
+      const button = screen.getByRole('button', { name: /Scan Directories/i });
+      fireEvent.click(button);
+
+      await waitFor(() => {
+        expect(alertSpy).toHaveBeenCalledWith('No plugins found in default VST3 directories.');
+      });
+
+      alertSpy.mockRestore();
+    });
+
+    it('should show preview dialog after auto-scan completes', async () => {
+      const mockScanDirectory = vi
+        .fn()
+        .mockResolvedValue([
+          { name: 'Plugin1.vst3', path: 'C:\\VST3\\Plugin1.vst3', isDirectory: false },
+        ]);
+
+      (window as any).electronAPI = {
+        selectDirectory: vi.fn(),
+        scanDirectory: mockScanDirectory,
+      };
+
+      render(<DirectoryScanner />);
+      const button = screen.getByRole('button', { name: /Scan Directories/i });
+      fireEvent.click(button);
+
+      await waitFor(
+        () => {
+          expect(screen.getByText('Import Instruments')).toBeInTheDocument();
+        },
+        { timeout: 3000 }
+      );
+    });
+
+    it('should parse VST3 filenames correctly', async () => {
+      const mockScanDirectory = vi.fn().mockResolvedValue([
+        {
+          name: 'Manufacturer - Plugin Name.vst3',
+          path: 'C:\\VST3\\Manufacturer - Plugin Name.vst3',
+          isDirectory: false,
+        },
+      ]);
+
+      (window as any).electronAPI = {
+        selectDirectory: vi.fn(),
+        scanDirectory: mockScanDirectory,
+      };
+
+      render(<DirectoryScanner />);
+      const button = screen.getByRole('button', { name: /Scan Directories/i });
+      fireEvent.click(button);
+
+      await waitFor(
+        () => {
+          expect(screen.getAllByText('Plugin Name').length).toBeGreaterThan(0);
+          expect(screen.getAllByText('Manufacturer').length).toBeGreaterThan(0);
+        },
+        { timeout: 3000 }
+      );
+    });
+
+    it('should auto-categorize plugins based on name patterns', async () => {
+      const mockScanDirectory = vi.fn().mockResolvedValue([
+        {
+          name: 'Orchestral Strings.vst3',
+          path: 'C:\\VST3\\Orchestral Strings.vst3',
+          isDirectory: false,
+        },
+        { name: 'Analog Synth.vst3', path: 'C:\\VST3\\Analog Synth.vst3', isDirectory: false },
+        { name: 'Drum Machine.vst3', path: 'C:\\VST3\\Drum Machine.vst3', isDirectory: false },
+      ]);
+
+      (window as any).electronAPI = {
+        selectDirectory: vi.fn(),
+        scanDirectory: mockScanDirectory,
+      };
+
+      render(<DirectoryScanner />);
+      const button = screen.getByRole('button', { name: /Scan Directories/i });
+      fireEvent.click(button);
+
+      await waitFor(
+        () => {
+          expect(screen.getAllByText('Orchestral').length).toBeGreaterThan(0);
+          expect(screen.getAllByText('Synth').length).toBeGreaterThan(0);
+          expect(screen.getAllByText('Drums').length).toBeGreaterThan(0);
+        },
+        { timeout: 3000 }
+      );
+    });
+
+    it('should detect host from path and name', async () => {
+      const mockScanDirectory = vi.fn().mockResolvedValue([
+        { name: 'Kontakt Library', path: 'C:\\VST3\\Kontakt\\Library', isDirectory: true },
+        { name: 'VST3 Plugin.vst3', path: 'C:\\VST3\\Plugin.vst3', isDirectory: false },
+      ]);
+
+      (window as any).electronAPI = {
+        selectDirectory: vi.fn(),
+        scanDirectory: mockScanDirectory,
+      };
+
+      render(<DirectoryScanner />);
+      const button = screen.getByRole('button', { name: /Scan Directories/i });
+      fireEvent.click(button);
+
+      await waitFor(
+        () => {
+          const hostBadges = screen.getAllByText('Kontakt');
+          expect(hostBadges.length).toBeGreaterThan(0);
+        },
+        { timeout: 3000 }
+      );
+    });
+
+    it('should filter for .vst3 files and directories', async () => {
+      const mockScanDirectory = vi.fn().mockResolvedValue([
+        { name: 'Plugin.vst3', path: 'C:\\VST3\\Plugin.vst3', isDirectory: false },
+        { name: 'Plugin.dll', path: 'C:\\VST3\\Plugin.dll', isDirectory: false },
+        { name: 'Folder', path: 'C:\\VST3\\Folder', isDirectory: true },
+      ]);
+
+      (window as any).electronAPI = {
+        selectDirectory: vi.fn(),
+        scanDirectory: mockScanDirectory,
+      };
+
+      render(<DirectoryScanner />);
+      const button = screen.getByRole('button', { name: /Scan Directories/i });
+      fireEvent.click(button);
+
+      await waitFor(
+        () => {
+          expect(screen.getByText('Import Instruments')).toBeInTheDocument();
+        },
+        { timeout: 3000 }
+      );
+
+      // Should show .vst3 file and directory, but not .dll
+      expect(screen.getAllByText(/Plugin/).length).toBeGreaterThan(0);
+      expect(screen.getAllByText(/Folder/).length).toBeGreaterThan(0);
+    });
+
+    it('should show auto-scanning state on button', async () => {
+      const mockScanDirectory = vi.fn().mockImplementation(() => new Promise(() => {})); // Never resolves
+
+      (window as any).electronAPI = {
+        selectDirectory: vi.fn(),
+        scanDirectory: mockScanDirectory,
+      };
+
+      render(<DirectoryScanner />);
+      const button = screen.getByRole('button', { name: /Scan Directories/i });
+      fireEvent.click(button);
+
+      await waitFor(() => {
+        expect(screen.getByText('Auto-Scanning...')).toBeInTheDocument();
+      });
+    });
+
+    it('should handle auto-scan errors gracefully', async () => {
+      const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
+      const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      // Mock scanDirectory to reject for all paths
+      const mockScanDirectory = vi.fn().mockRejectedValue(new Error('Scan failed'));
+
+      (window as any).electronAPI = {
+        selectDirectory: vi.fn(),
+        scanDirectory: mockScanDirectory,
+      };
+
+      render(<DirectoryScanner />);
+      const button = screen.getByRole('button', { name: /Scan Directories/i });
+      fireEvent.click(button);
+
+      // Wait for the error to be caught and logged
+      await waitFor(
+        () => {
+          expect(consoleWarnSpy).toHaveBeenCalled();
+        },
+        { timeout: 3000 }
+      );
+
+      // The error should be logged, and alert should show "No plugins found" if all paths fail
+      expect(alertSpy).toHaveBeenCalled();
+
+      alertSpy.mockRestore();
+      consoleWarnSpy.mockRestore();
     });
   });
 });

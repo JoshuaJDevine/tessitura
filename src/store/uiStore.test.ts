@@ -418,4 +418,237 @@ describe('uiStore', () => {
       expect(state.selectedHosts).toHaveLength(0);
     });
   });
+
+  describe('collection view state', () => {
+    beforeEach(() => {
+      // Reset collection view state
+      useUIStore.setState({
+        collectionView: {
+          sortBy: 'name',
+          viewDensity: 'spacious',
+          selectedCardIds: [],
+        },
+      });
+    });
+
+    describe('setCollectionSort', () => {
+      it('should set sortBy to name', () => {
+        const store = useUIStore.getState();
+
+        store.setCollectionSort('name');
+
+        const state = useUIStore.getState();
+        expect(state.collectionView.sortBy).toBe('name');
+      });
+
+      it('should set sortBy to recent', () => {
+        const store = useUIStore.getState();
+
+        store.setCollectionSort('recent');
+
+        const state = useUIStore.getState();
+        expect(state.collectionView.sortBy).toBe('recent');
+      });
+
+      it('should set sortBy to category', () => {
+        const store = useUIStore.getState();
+
+        store.setCollectionSort('category');
+
+        const state = useUIStore.getState();
+        expect(state.collectionView.sortBy).toBe('category');
+      });
+
+      it('should set sortBy to developer', () => {
+        const store = useUIStore.getState();
+
+        store.setCollectionSort('developer');
+
+        const state = useUIStore.getState();
+        expect(state.collectionView.sortBy).toBe('developer');
+      });
+
+      it('should update sortBy without affecting other collection view state', () => {
+        const store = useUIStore.getState();
+
+        store.setCollectionSort('recent');
+
+        const state = useUIStore.getState();
+        expect(state.collectionView.sortBy).toBe('recent');
+        expect(state.collectionView.viewDensity).toBe('spacious');
+        expect(state.collectionView.selectedCardIds).toEqual([]);
+      });
+    });
+
+    describe('setViewDensity', () => {
+      it('should set viewDensity to compact', () => {
+        const store = useUIStore.getState();
+
+        store.setViewDensity('compact');
+
+        const state = useUIStore.getState();
+        expect(state.collectionView.viewDensity).toBe('compact');
+      });
+
+      it('should set viewDensity to spacious', () => {
+        const store = useUIStore.getState();
+
+        store.setViewDensity('spacious');
+
+        const state = useUIStore.getState();
+        expect(state.collectionView.viewDensity).toBe('spacious');
+      });
+
+      it('should update viewDensity without affecting other collection view state', () => {
+        const store = useUIStore.getState();
+
+        store.setViewDensity('compact');
+
+        const state = useUIStore.getState();
+        expect(state.collectionView.viewDensity).toBe('compact');
+        expect(state.collectionView.sortBy).toBe('name');
+        expect(state.collectionView.selectedCardIds).toEqual([]);
+      });
+
+      it('should toggle between compact and spacious', () => {
+        const store = useUIStore.getState();
+
+        expect(useUIStore.getState().collectionView.viewDensity).toBe('spacious');
+
+        store.setViewDensity('compact');
+        expect(useUIStore.getState().collectionView.viewDensity).toBe('compact');
+
+        store.setViewDensity('spacious');
+        expect(useUIStore.getState().collectionView.viewDensity).toBe('spacious');
+      });
+    });
+
+    describe('toggleCardSelection', () => {
+      it('should add card ID to selectedCardIds when not present', () => {
+        const store = useUIStore.getState();
+
+        store.toggleCardSelection('card-1');
+
+        const state = useUIStore.getState();
+        expect(state.collectionView.selectedCardIds).toContain('card-1');
+        expect(state.collectionView.selectedCardIds).toHaveLength(1);
+      });
+
+      it('should remove card ID from selectedCardIds when present', () => {
+        const store = useUIStore.getState();
+
+        store.toggleCardSelection('card-1');
+        store.toggleCardSelection('card-1');
+
+        const state = useUIStore.getState();
+        expect(state.collectionView.selectedCardIds).not.toContain('card-1');
+        expect(state.collectionView.selectedCardIds).toHaveLength(0);
+      });
+
+      it('should add multiple card IDs', () => {
+        const store = useUIStore.getState();
+
+        store.toggleCardSelection('card-1');
+        store.toggleCardSelection('card-2');
+        store.toggleCardSelection('card-3');
+
+        const state = useUIStore.getState();
+        expect(state.collectionView.selectedCardIds).toEqual(['card-1', 'card-2', 'card-3']);
+      });
+
+      it('should remove specific card ID without affecting others', () => {
+        const store = useUIStore.getState();
+
+        store.toggleCardSelection('card-1');
+        store.toggleCardSelection('card-2');
+        store.toggleCardSelection('card-3');
+        store.toggleCardSelection('card-2'); // Remove card-2
+
+        const state = useUIStore.getState();
+        expect(state.collectionView.selectedCardIds).toEqual(['card-1', 'card-3']);
+      });
+
+      it('should not affect other collection view state', () => {
+        const store = useUIStore.getState();
+
+        store.toggleCardSelection('card-1');
+
+        const state = useUIStore.getState();
+        expect(state.collectionView.selectedCardIds).toContain('card-1');
+        expect(state.collectionView.sortBy).toBe('name');
+        expect(state.collectionView.viewDensity).toBe('spacious');
+      });
+    });
+
+    describe('clearSelection', () => {
+      it('should clear all selected card IDs', () => {
+        const store = useUIStore.getState();
+
+        store.toggleCardSelection('card-1');
+        store.toggleCardSelection('card-2');
+        store.toggleCardSelection('card-3');
+
+        store.clearSelection();
+
+        const state = useUIStore.getState();
+        expect(state.collectionView.selectedCardIds).toEqual([]);
+      });
+
+      it('should work when no cards are selected', () => {
+        const store = useUIStore.getState();
+
+        store.clearSelection();
+
+        const state = useUIStore.getState();
+        expect(state.collectionView.selectedCardIds).toEqual([]);
+      });
+
+      it('should not affect other collection view state', () => {
+        const store = useUIStore.getState();
+
+        store.setCollectionSort('recent');
+        store.setViewDensity('compact');
+        store.toggleCardSelection('card-1');
+        store.clearSelection();
+
+        const state = useUIStore.getState();
+        expect(state.collectionView.selectedCardIds).toEqual([]);
+        expect(state.collectionView.sortBy).toBe('recent');
+        expect(state.collectionView.viewDensity).toBe('compact');
+      });
+    });
+
+    describe('collection view state independence', () => {
+      it('should allow independent updates to sort, density, and selection', () => {
+        const store = useUIStore.getState();
+
+        store.setCollectionSort('category');
+        store.setViewDensity('compact');
+        store.toggleCardSelection('card-1');
+        store.toggleCardSelection('card-2');
+
+        const state = useUIStore.getState();
+        expect(state.collectionView.sortBy).toBe('category');
+        expect(state.collectionView.viewDensity).toBe('compact');
+        expect(state.collectionView.selectedCardIds).toEqual(['card-1', 'card-2']);
+      });
+
+      it('should not affect other UI store state', () => {
+        const store = useUIStore.getState();
+
+        store.setSearchQuery('test');
+        store.toggleCategory('Synth');
+        store.setCollectionSort('developer');
+        store.setViewDensity('compact');
+        store.toggleCardSelection('card-1');
+
+        const state = useUIStore.getState();
+        expect(state.searchQuery).toBe('test');
+        expect(state.selectedCategories).toEqual(['Synth']);
+        expect(state.collectionView.sortBy).toBe('developer');
+        expect(state.collectionView.viewDensity).toBe('compact');
+        expect(state.collectionView.selectedCardIds).toEqual(['card-1']);
+      });
+    });
+  });
 });
