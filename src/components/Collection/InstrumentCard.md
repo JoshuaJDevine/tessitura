@@ -80,6 +80,24 @@ function MyComponent() {
 - Keyboard: Enter/Space key support for accessibility
 - Selected: Outline highlight with primary color
 
+## Accessibility
+
+The component follows ARIA best practices for interactive elements:
+
+- **Role**: `role="button"` - Indicates the card is clickable
+- **Tab Index**: `tabIndex={0}` - Makes card keyboard focusable
+- **ARIA Label**: Descriptive label in format `"{instrument name} by {developer}"`
+- **ARIA Selected**: `aria-selected` attribute reflects selection state
+- **Keyboard Support**: 
+  - `Enter` key triggers selection
+  - `Space` key triggers selection
+  - Both prevent default browser behavior
+
+**Screen Reader Support:**
+- Card announces as button with descriptive label
+- Selection state is announced via `aria-selected`
+- Keyboard navigation follows tab order
+
 ## State Management
 
 This component is **presentational** - it doesn't manage any state itself. All state comes from props:

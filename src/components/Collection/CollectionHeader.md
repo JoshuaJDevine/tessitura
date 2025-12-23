@@ -89,6 +89,14 @@ Right side: View density toggle and action buttons
 - `setViewDensity(density)` - Update view density
 - `openAddInstrument()` - Open add dialog
 
+## Accessibility
+
+- Sort dropdown uses accessible Select component with proper labels
+- View density toggle buttons have descriptive icons (LayoutGrid, LayoutList)
+- Instrument count uses semantic text (not just numbers)
+- All interactive elements are keyboard accessible
+- Button labels are clear and descriptive
+
 ## Related Components
 
 - `CollectionView` - Parent component that uses this header

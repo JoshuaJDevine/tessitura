@@ -92,6 +92,13 @@ Grid spacing: 24px gap, 32px padding around grid.
 - No virtual scrolling needed for Phase 1 (< 500 plugins expected)
 - If performance issues: Add react-window in Phase 2
 
+## Accessibility
+
+- All cards are keyboard accessible via `InstrumentCard`'s keyboard support
+- Grid maintains logical tab order (left-to-right, top-to-bottom)
+- Empty states include actionable buttons with proper ARIA labels
+- Filter/sort controls use accessible shadcn/ui components with proper labels
+
 ## Related Components
 
 - `InstrumentCard` - Individual card component

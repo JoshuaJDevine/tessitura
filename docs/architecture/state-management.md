@@ -94,7 +94,7 @@ The application uses Zustand for state management with a multi-store architectur
   editingInstrumentId: string | null
   suggestedInstrumentId: string | null
   collectionView: {
-    sortBy: 'name' | 'recent' | 'most-used' | 'least-used' | 'category'
+    sortBy: 'name' | 'recent' | 'category' | 'developer'
     viewDensity: 'compact' | 'spacious'
     selectedCardIds: string[]
   }

@@ -101,6 +101,24 @@ Features:
   - World: "world", "ethnic"
   - Effects: "effect", "reverb", "delay", "eq"
 
+### Helper Functions
+
+**parseVST3FileName(fileName: string): ScannedItem['parsed']**
+- Removes `.vst3` extension
+- Parses common patterns: `"Manufacturer - Plugin Name.vst3"` or `"Manufacturer_Plugin_Name.vst3"`
+- Returns object with `developer` and `instrumentName`, or just `instrumentName` if parsing fails
+- Used during auto-scan to extract metadata from VST3 filenames
+
+**detectCategory(name: string): Category**
+- Searches instrument name (case-insensitive) for category keywords
+- Returns first matching category, or `'Other'` if no match
+- Used to auto-categorize instruments during scanning
+
+**detectHost(path: string, name: string): Host**
+- Searches both path and name (case-insensitive) for host keywords
+- Priority order: Kontakt → Soundbox → SINE → Opus → VST3 → AU → Other
+- Used to detect plugin host type from file path/name
+
 ## Related Components
 
 - `Sidebar` - Parent container
