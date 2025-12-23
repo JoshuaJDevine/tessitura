@@ -139,3 +139,4 @@ Edges are created from instrument pairings:
 - Layout algorithms (force-directed, grid, etc.)
 - Multi-select with selection box
 
+

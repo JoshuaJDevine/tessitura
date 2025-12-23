@@ -130,3 +130,4 @@ The documentation is generated during the GitHub Actions workflow. To preview lo
 - [GitHub Wiki Documentation](https://docs.github.com/en/communities/documenting-your-project-with-wikis)
 - [Vite Build Configuration](https://vitejs.dev/guide/build.html)
 
+

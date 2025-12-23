@@ -10,4 +10,3 @@ contextBridge.exposeInMainWorld('electronAPI', {
     return ipcRenderer.invoke('select-directory');
   },
 });
-

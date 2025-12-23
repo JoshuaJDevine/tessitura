@@ -95,3 +95,4 @@ Filtered nodes are hidden (not removed) to preserve positions.
 - Keyboard navigation (arrow keys)
 - Zoom to fit selected nodes
 
+

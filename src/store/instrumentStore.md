@@ -143,3 +143,4 @@ Category-based default colors:
 - Version history
 - IndexedDB migration for better performance
 
+

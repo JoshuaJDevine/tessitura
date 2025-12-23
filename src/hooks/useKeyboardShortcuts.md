@@ -67,3 +67,4 @@ Uses `window.addEventListener('keydown')` with cleanup on unmount.
   - Arrow keys - Navigate canvas
   - `Ctrl+F` - Focus filters
 
+
