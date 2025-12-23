@@ -132,14 +132,12 @@ npm run feature:start
 ## Contributing
 
 1. Run `npm run feature:start` to begin
-2. Follow the agent cascade workflow
-3. Ensure all tests pass and coverage meets standards
-4. Complete all documentation
-5. Run `npm run feature:complete` when done
-6. Format and verify: `npm run format && npm run pre-push`
-7. Push branch to GitHub: `git push -u origin feature/name`
-8. Create PR on GitHub (never merge to main locally)
-9. Merge through GitHub's PR interface after review
+2. Follow the agent cascade workflow (@architect → @coder → @test → @docs)
+3. @docs agent formats, validates, and pushes to GitHub
+4. Engineer creates PR on GitHub
+5. Wait for CI/CD to pass
+6. Merge via GitHub's interface (never merge locally)
+7. Run `npm run feature:complete` to archive and cleanup
 
 ## License
 
