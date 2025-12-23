@@ -182,7 +182,7 @@ export function DirectoryScanner() {
   };
 
   return (
-    <div className="border-t p-4">
+    <div className="border-t mt-4 p-4">
       <Button
         variant="outline"
         className="w-full"

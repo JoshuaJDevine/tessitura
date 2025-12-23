@@ -11,6 +11,19 @@ This project uses multiple agent roles in a cascade workflow:
 See `AGENT-CASCADE.md` for the complete workflow guide.
 See `.cursorrules-test` for detailed @test agent instructions.
 
+## 🚨 Critical Git Rules
+
+**AGENTS NEVER MERGE TO MAIN LOCALLY**
+
+- ✅ Always work on feature branches (`feature/name`)
+- ✅ Push branches to GitHub
+- ✅ Create PRs on GitHub
+- ✅ Merge through GitHub's interface
+- ❌ NEVER `git checkout main && git merge`
+- ❌ NEVER `git push origin main` directly
+
+**Why?** Code review, CI/CD validation, traceability, branch protection, and team collaboration.
+
 ## Self-Documenting Architecture
 
 ### Core Principle
@@ -353,6 +366,12 @@ When updating documentation:
 4. Ensure examples are current
 5. Update "Last Updated" with date and reason
 6. Verify all sections are complete
+7. **Pre-Push Steps:**
+   - Run `npm run format` to format all code
+   - Run all CI checks: `docs:validate`, `type-check`, `lint`, `format:check`, `test`
+   - Commit any formatting changes
+8. **Final Step:** Instruct engineer to push branch to GitHub: `git push -u origin feature/name`
+9. **NEVER merge to main locally** - always create PR on GitHub
 
 ### Quick Reference
 

@@ -40,18 +40,18 @@ export const InstrumentNode = memo(({ data, selected }: NodeProps<InstrumentNode
         onContextMenu={(e) => e.preventDefault()}
       >
         <Handle type="target" position={Position.Top} />
-        
+
         <div className="space-y-2">
           <div className="flex items-start justify-between gap-2">
             <Badge variant="outline" className={cn('text-xs', hostColorClass)}>
               {instrument.host}
             </Badge>
           </div>
-          
+
           <h3 className="font-semibold text-sm leading-tight">{instrument.name}</h3>
-          
+
           <p className="text-xs text-muted-foreground">{instrument.developer}</p>
-          
+
           {instrument.tags.length > 0 && (
             <div className="flex flex-wrap gap-1">
               {instrument.tags.slice(0, 3).map((tag) => (
@@ -67,7 +67,7 @@ export const InstrumentNode = memo(({ data, selected }: NodeProps<InstrumentNode
             </div>
           )}
         </div>
-        
+
         <Handle type="source" position={Position.Bottom} />
       </div>
     </ContextMenu>
@@ -75,4 +75,3 @@ export const InstrumentNode = memo(({ data, selected }: NodeProps<InstrumentNode
 });
 
 InstrumentNode.displayName = 'InstrumentNode';
-

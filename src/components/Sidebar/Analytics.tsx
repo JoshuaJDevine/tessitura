@@ -47,7 +47,7 @@ export function Analytics() {
   }, [instruments]);
 
   return (
-    <div className="space-y-4 border-t p-4">
+    <div className="space-y-4 border-t mt-4 p-4">
       <div className="flex items-center gap-2">
         <BarChart3 className="h-5 w-5" />
         <h3 className="font-semibold">Analytics</h3>
