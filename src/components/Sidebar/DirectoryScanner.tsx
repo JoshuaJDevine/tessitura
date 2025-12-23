@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useInstrumentStore } from '@/store/instrumentStore';
 import { Button } from '@/components/ui/button';
-import { FolderOpen, Loader2 } from 'lucide-react';
+import { FolderOpen, Loader2, Scan } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -24,6 +24,14 @@ declare global {
   }
 }
 
+// Default VST3 paths for Windows
+// TODO: Add platform detection for Mac paths in Phase 2
+const DEFAULT_VST_PATHS = [
+  'C:\\Program Files\\Common Files\\VST3\\',
+  'C:\\Program Files\\VSTPlugins\\',
+  'C:\\Program Files (x86)\\Common Files\\VST3\\',
+];
+
 interface ScannedItem {
   name: string;
   path: string;
@@ -42,6 +50,9 @@ export function DirectoryScanner() {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [scannedItems, setScannedItems] = useState<ScannedItem[]>([]);
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
+  const [isAutoScanning, setIsAutoScanning] = useState(false);
+  const [scanProgress, setScanProgress] = useState({ current: 0, total: 0, path: '', found: 0 });
+  const [isProgressOpen, setIsProgressOpen] = useState(false);
 
   const parseFolderName = (name: string): ScannedItem['parsed'] => {
     // Heuristics to parse common patterns:
@@ -96,15 +107,115 @@ export function DirectoryScanner() {
     )
       return 'Orchestral';
     if (lower.includes('synth') || lower.includes('synthesizer')) return 'Synth';
-    if (lower.includes('drum') || lower.includes('percussion')) return 'Drums';
+    if (
+      lower.includes('drum') ||
+      lower.includes('percussion') ||
+      lower.includes('kick') ||
+      lower.includes('snare')
+    )
+      return 'Drums';
     if (lower.includes('piano') || lower.includes('key')) return 'Keys';
     if (lower.includes('vocal') || lower.includes('choir') || lower.includes('voice'))
       return 'Vocal';
     if (lower.includes('world') || lower.includes('ethnic')) return 'World';
-    if (lower.includes('effect') || lower.includes('reverb') || lower.includes('delay'))
+    if (
+      lower.includes('effect') ||
+      lower.includes('reverb') ||
+      lower.includes('delay') ||
+      lower.includes('eq')
+    )
       return 'Effects';
 
     return 'Other';
+  };
+
+  const parseVST3FileName = (fileName: string): ScannedItem['parsed'] => {
+    // Remove .vst3 extension
+    const nameWithoutExt = fileName.replace(/\.vst3$/i, '');
+
+    // Try to parse manufacturer and plugin name
+    // Common patterns: "Manufacturer - Plugin Name.vst3" or "Manufacturer_Plugin_Name.vst3"
+    const parts = nameWithoutExt.split(/[-_]/);
+    if (parts.length >= 2) {
+      return {
+        developer: parts[0].trim(),
+        instrumentName: parts.slice(1).join(' ').trim(),
+      };
+    }
+
+    return {
+      instrumentName: nameWithoutExt,
+    };
+  };
+
+  const handleAutoScan = async () => {
+    if (!window.electronAPI) {
+      alert('Electron API not available. This feature requires the Electron app.');
+      return;
+    }
+
+    try {
+      setIsAutoScanning(true);
+      setIsProgressOpen(true);
+      const allScannedItems: ScannedItem[] = [];
+
+      // Use Windows paths (could detect platform later)
+      const pathsToScan = DEFAULT_VST_PATHS;
+      let totalFound = 0;
+
+      for (let i = 0; i < pathsToScan.length; i++) {
+        const path = pathsToScan[i];
+        setScanProgress({ current: i + 1, total: pathsToScan.length, path, found: totalFound });
+
+        try {
+          const items = await window.electronAPI.scanDirectory(path);
+
+          // Filter for .vst3 files or directories
+          const vstItems: ScannedItem[] = items
+            .filter((item) => {
+              if (item.isDirectory) return true;
+              return item.name.toLowerCase().endsWith('.vst3');
+            })
+            .map((item) => {
+              const parsed = item.isDirectory
+                ? parseFolderName(item.name)
+                : parseVST3FileName(item.name);
+
+              return {
+                ...item,
+                parsed: {
+                  ...parsed,
+                  host: detectHost(item.path, item.name),
+                  category: detectCategory(item.name),
+                },
+              };
+            });
+
+          allScannedItems.push(...vstItems);
+          totalFound += vstItems.length;
+          setScanProgress({ current: i + 1, total: pathsToScan.length, path, found: totalFound });
+        } catch (error) {
+          // Path doesn't exist or access denied - skip
+          console.warn(`Could not scan path: ${path}`, error);
+        }
+      }
+
+      if (allScannedItems.length === 0) {
+        alert('No plugins found in default VST3 directories.');
+        setIsProgressOpen(false);
+        return;
+      }
+
+      setScannedItems(allScannedItems);
+      setSelectedItems(new Set(allScannedItems.map((item) => item.path)));
+      setIsPreviewOpen(true);
+    } catch (error) {
+      console.error('Error auto-scanning directories:', error);
+      alert('Error auto-scanning directories. Please try again.');
+    } finally {
+      setIsAutoScanning(false);
+      setIsProgressOpen(false);
+    }
   };
 
   const handleScan = async () => {
@@ -182,7 +293,26 @@ export function DirectoryScanner() {
   };
 
   return (
-    <div className="border-t mt-4 p-4">
+    <div className="border-t mt-4 p-4 space-y-2">
+      <Button
+        variant="default"
+        className="w-full"
+        onClick={handleAutoScan}
+        disabled={isAutoScanning || !window.electronAPI}
+      >
+        {isAutoScanning ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Auto-Scanning...
+          </>
+        ) : (
+          <>
+            <Scan className="mr-2 h-4 w-4" />
+            Scan Directories
+          </>
+        )}
+      </Button>
+
       <Button
         variant="outline"
         className="w-full"
@@ -197,7 +327,7 @@ export function DirectoryScanner() {
         ) : (
           <>
             <FolderOpen className="mr-2 h-4 w-4" />
-            Scan Directory
+            Choose Directory
           </>
         )}
       </Button>
@@ -261,6 +391,36 @@ export function DirectoryScanner() {
               Import {selectedItems.size} Instrument(s)
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Progress Dialog */}
+      <Dialog open={isProgressOpen} onOpenChange={() => {}}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Scanning Directories</DialogTitle>
+            <DialogDescription>Scanning standard VST3 paths for plugins...</DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span>
+                  Path {scanProgress.current} of {scanProgress.total}
+                </span>
+                <span>{scanProgress.found} plugins found</span>
+              </div>
+              <div className="w-full bg-secondary rounded-full h-2">
+                <div
+                  className="bg-primary h-2 rounded-full transition-all duration-300"
+                  style={{
+                    width: `${(scanProgress.current / scanProgress.total) * 100}%`,
+                  }}
+                />
+              </div>
+            </div>
+            <p className="text-sm text-muted-foreground truncate">{scanProgress.path}</p>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
