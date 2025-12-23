@@ -23,6 +23,7 @@
     "test:coverage": "vitest --coverage",
     "feature:start": "node scripts/start-feature.js",
     "feature:complete": "node scripts/complete-feature.js",
+    "pre-push": "node scripts/pre-push-check.js",
     "prepare": "husky"
   },
   "keywords": [

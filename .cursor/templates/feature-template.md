@@ -114,6 +114,44 @@
 - [ ] Test coverage meets standards
 - [ ] Manual testing complete
 
+### Pre-Push Commands (Run These Before Pushing!)
+
+**1. Format All Code**
+```bash
+npm run format
+```
+
+**2. Run All CI Checks Locally**
+
+**Option A: Automated (Recommended)**
+```bash
+npm run pre-push
+```
+
+**Option B: Manual**
+```bash
+# Documentation validation
+npm run docs:validate
+
+# TypeScript type check
+npm run type-check
+
+# Linting
+npm run lint
+
+# Format check (should pass after step 1)
+npm run format:check
+
+# Run tests
+npm test -- --run
+```
+
+**3. Commit Formatting Changes (if any)**
+```bash
+git add -A
+git commit -m "style: format code with Prettier"
+```
+
 ### Push to GitHub
 **IMPORTANT: Never merge to main locally. Always push branch and create PR on GitHub.**
 

@@ -297,12 +297,26 @@ npm run feature:complete
 
 This will:
 - Archive the feature file to `.cursor/features/completed/`
-- Show you the push instructions
+- Show you the pre-push checklist
 
-**Push to GitHub:**
+**Pre-Push Steps (CRITICAL - Do Not Skip!):**
+
 ```bash
+# 1. Format all code
+npm run format
+
+# 2. Verify all CI checks pass locally (automated)
+npm run pre-push
+
+# 3. Commit any formatting changes
+git add -A
+git commit -m "style: format code with Prettier"
+
+# 4. Push to GitHub
 git push -u origin feature/canvas-zoom
 ```
+
+**Note:** The `npm run pre-push` command runs all checks (docs:validate, type-check, lint, format:check, test) and provides a summary.
 
 **⚠️ IMPORTANT: Never merge to main locally**
 
@@ -311,7 +325,7 @@ git push -u origin feature/canvas-zoom
 2. Visit that URL
 3. Fill in PR description
 4. Request reviews
-5. Wait for CI/CD to pass
+5. Wait for CI/CD to pass (should match local results)
 6. **Merge through GitHub's interface** (not locally)
 
 ## 🎨 Why This Works

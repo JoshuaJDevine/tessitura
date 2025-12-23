@@ -366,8 +366,12 @@ When updating documentation:
 4. Ensure examples are current
 5. Update "Last Updated" with date and reason
 6. Verify all sections are complete
-7. **Final Step:** Instruct engineer to run `npm run feature:complete`, then push branch to GitHub
-8. **NEVER merge to main locally** - always create PR on GitHub
+7. **Pre-Push Steps:**
+   - Run `npm run format` to format all code
+   - Run all CI checks: `docs:validate`, `type-check`, `lint`, `format:check`, `test`
+   - Commit any formatting changes
+8. **Final Step:** Instruct engineer to push branch to GitHub: `git push -u origin feature/name`
+9. **NEVER merge to main locally** - always create PR on GitHub
 
 ### Quick Reference
 

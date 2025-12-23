@@ -149,6 +149,20 @@ src/
 # ✅ Correct workflow
 git checkout -b feature/new-feature
 # ... work on feature ...
+
+# BEFORE PUSHING: Format and verify
+npm run format
+npm run docs:validate
+npm run type-check
+npm run lint
+npm run format:check
+npm test -- --run
+
+# Commit any formatting changes
+git add -A
+git commit -m "style: format code with Prettier"
+
+# Now push
 git push -u origin feature/new-feature
 # Create PR on GitHub → Review → Merge via GitHub
 
@@ -157,6 +171,18 @@ git checkout main
 git merge feature/new-feature  # NEVER do this!
 git push origin main           # NEVER do this!
 ```
+
+### Pre-Push Checklist
+
+Before pushing any branch to GitHub, always:
+1. ✅ Format code: `npm run format`
+2. ✅ Validate docs: `npm run docs:validate`
+3. ✅ Type check: `npm run type-check`
+4. ✅ Lint: `npm run lint`
+5. ✅ Format check: `npm run format:check`
+6. ✅ Test: `npm test -- --run`
+7. ✅ Commit formatting: `git add -A && git commit -m "style: format code with Prettier"`
+8. ✅ Push: `git push -u origin feature/name`
 
 ### Commit Message Format
 
