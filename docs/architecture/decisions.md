@@ -200,31 +200,37 @@ Enable TypeScript strict mode with all checks enabled.
 
 ## 🔄 MAJOR PIVOT: Card Collection Interface
 
-**Date:** 2024-12-22  
+**Date:** 2025-12-23  
 **Status:** In Progress
 
 The following ADRs document the architectural pivot from node-canvas to card-based collection interface.
+
+This is an **exploratory project** focused on creative intuition over incremental improvement. Current DAW browsers (Bitwig, Ableton, Omnisphere 3) are frustrating musicians. We're testing a radical alternative.
 
 ---
 
 ## ADR-009: Card-Based UI Over Spatial Canvas
 
-**Date:** 2024-12-22  
+**Date:** 2025-12-23  
 **Status:** Accepted
 
 ### Context
-The node-canvas approach (using React Flow) is functional but doesn't solve the core problem: discovery and memory. Spatial positioning is arbitrary and doesn't build muscle memory. Users still forget about underutilized instruments.
+The node-canvas approach feels uninspiring and reminds users of work tools (Jira boards). After testing, it's clear the canvas isn't fun or useful. Current music software UIs have stagnated - Omnisphere 3 shipped with amazing samples but musicians are frustrated by the unchanged, painful interface.
+
+We need something **radically different** that makes browsing a plugin collection feel exciting, not utilitarian.
 
 ### Decision
-Replace the canvas interface with a card-based collection UI inspired by collectible card games (Hearthstone, Magic: The Gathering).
+**Completely remove** the canvas interface and replace it with a card-based collection grid inspired by collectible card games (Hearthstone) and modern game libraries (GOG Galaxy, Steam).
+
+This is a full replacement, not a toggle or alternative view.
 
 ### Rationale
-1. **Better Scanning**: Grid view shows 12-24 items at once vs. canvas's variable visibility
-2. **Clear Mental Model**: Everyone understands card collections (trading cards, Steam library)
-3. **Gamification-Ready**: Cards naturally support rarity, stats, achievements, and progression
-4. **Performance**: Grid with virtual scrolling outperforms hundreds of canvas nodes
-5. **Visual Hierarchy**: Rarity effects create passive discovery (glowing cards = frequently used)
-6. **Fun Factor**: Cards are inherently more playful and engaging than nodes on a canvas
+1. **Fun First**: Opening a card collection feels exciting, like opening a deck of magic cards
+2. **Visual Browsing**: Grid layout shows 12-24 cards at once, easy to scan visually
+3. **Familiar Mental Model**: Everyone understands card collections from games, trading cards, music streaming
+4. **Extensible Foundation**: Cards can support artwork, animations, stats, rarity without rearchitecting
+5. **Better Than DAWs**: Current plugin browsers are essentially boring lists. We can do better.
+6. **Creative Intuition**: Following a gut feeling that spatial organization of abstract nodes is the wrong paradigm
 
 ### Consequences
 - **Positive:** More engaging UX, better discoverability, easier to build features on top of, better performance
@@ -232,27 +238,77 @@ Replace the canvas interface with a card-based collection UI inspired by collect
 - **Migration:** Canvas code becomes legacy, moved to `legacy/` folder for reference
 
 ### Alternatives Considered
-1. **3D Memory Palace**: Navigable 3D space with instruments in rooms
-   - Rejected: Too complex for MVP, might feel gimmicky
-2. **Modular Rack UI**: Vertical rack with patch cables
-   - Rejected: Doesn't scale beyond ~20 instruments per rack
-3. **Keep Canvas**: Improve existing approach
-   - Rejected: Fundamentally doesn't solve discovery problem
+1. **Improve Canvas**: Add visual polish, better layouts
+   - Rejected: User tested it, not inspiring, feels like work tools
+2. **Traditional List View**: Like Ableton browser with folders
+   - Rejected: This is what everyone does, and it sucks
+3. **3D Virtual Studio**: Walk through rooms with instruments
+   - Rejected: Too complex for Phase 1, might be gimmicky
+
+### Phase 1 Simplifications
+To prove the concept quickly:
+- **No rarity system** (needs usage data first)
+- **No deck builder** (Phase 2)
+- **No animations** beyond basic hover effects
+- **No "Surprise Me"** discovery (Phase 2)
+- **Focus**: Beautiful cards + auto-scanning = immediate value
 
 ---
 
-## ADR-010: Decks Replace Templates and Groups
+## ADR-010: Directory Auto-Scanning for Real Data
 
-**Date:** 2024-12-22  
+**Date:** 2025-12-23  
 **Status:** Accepted
 
 ### Context
-Current system has both Templates (with position data) and Groups (visual containers). With the canvas removed, position data is irrelevant. Both concepts serve similar purposes and cause confusion.
+Manually adding 100+ plugins defeats the purpose. Need immediate value with real plugin collection, not seed data.
 
 ### Decision
-Merge Templates and Groups into a single concept: **Decks**.
+Implement directory scanner that auto-discovers VST3/AU plugins and creates instrument cards automatically.
 
-A Deck is a curated collection of instruments for a specific workflow (e.g., "Cinematic Scoring", "Electronic Production", "Sound Design Experiments").
+**Phase 1 Priority:** This is critical to test with real data.
+
+### Rationale
+1. **Immediate Value**: See your actual collection in seconds
+2. **Real Testing**: Test UI with 50-200 real plugins, not 10 seed items
+3. **Discovery**: Find plugins you forgot you owned
+4. **Foundation**: Enables future usage tracking, recommendations
+5. **Reduces Friction**: Zero manual data entry
+
+### Implementation
+- **Windows Paths**:
+  - `C:\Program Files\Common Files\VST3\`
+  - `C:\Program Files\VSTPlugins\`
+  - User can configure additional paths
+- **Mac Paths**:
+  - `/Library/Audio/Plug-Ins/VST3/`
+  - `/Library/Audio/Plug-Ins/Components/` (AU)
+- **Metadata Extraction**:
+  - Parse VST3 module info (name, manufacturer)
+  - Fallback to filename if metadata unavailable
+  - Auto-categorize by folder/naming patterns (synth, effect, etc.)
+- **Progress UI**: Show scan progress with count
+
+### Consequences
+- **Positive:** Immediate real-world testing, finds forgotten plugins
+- **Negative:** Platform-specific code, metadata parsing complexity
+- **Technical Debt:** Will need refinement for Kontakt libraries (folder-based, not single files)
+
+---
+
+## ADR-011: Decks Replace Templates and Groups (Phase 2)
+
+**Date:** 2025-12-23  
+**Status:** Deferred to Phase 2
+
+### Context
+Current system has both Templates (with position data) and Groups (visual containers). With canvas removed, position data is irrelevant. However, for Phase 1, we're focusing on cards + scanning only.
+
+**Phase 1:** Templates and Groups remain unchanged (though less prominent without canvas).  
+**Phase 2:** Will merge into **Decks** once card UI is proven.
+
+### Decision (Future)
+Merge Templates and Groups into **Decks** - curated collections of instruments for specific workflows (e.g., "Cinematic Scoring", "Electronic Production").
 
 ### Rationale
 1. **Clearer Mental Model**: "Deck" implies a working set for a specific purpose
@@ -271,15 +327,18 @@ A Deck is a curated collection of instruments for a specific workflow (e.g., "Ci
 
 ---
 
-## ADR-011: Usage-Based Rarity System
+## ADR-012: Usage-Based Rarity System (Phase 2)
 
-**Date:** 2024-12-22  
-**Status:** Accepted
+**Date:** 2025-12-23  
+**Status:** Deferred to Phase 2
 
 ### Context
 Users forget about underutilized instruments. Need a passive discovery mechanism that surfaces forgotten tools without requiring manual organization.
 
-### Decision
+**Phase 1:** Skip rarity system - need usage data first.  
+**Phase 2:** Add rarity after collecting usage patterns.
+
+### Decision (Future)
 Implement visible "rarity" levels based on usage count, displayed as visual card effects (shimmer, glow, border).
 
 **Rarity Tiers:**
@@ -307,39 +366,53 @@ Implement visible "rarity" levels based on usage count, displayed as visual card
 
 ---
 
-## ADR-012: Phased AI Integration
+## ADR-013: Phased Feature Development
 
-**Date:** 2024-12-22  
+**Date:** 2025-12-23  
 **Status:** Accepted
 
 ### Context
-AI-powered recommendations and semantic search ("show me warm pads") are compelling features, but add significant complexity. Need to prove the core card UI works before investing in AI infrastructure.
+Original plan included rarity, decks, AI, animations, and more in Phase 1. That's too much. This is an exploratory project - need to prove card UI concept works before adding complexity.
 
 ### Decision
-Phase AI integration after core card UI is proven. Build foundation first, add intelligence later.
+Radically simplify Phase 1. Add features incrementally only after validating previous phases.
 
-**Phase Boundaries:**
-- **Phase 1** (Current): Card UI, Decks, Manual organization, Basic "Surprise Me" (random underused instruments)
-- **Phase 2** (Future): Local LLM integration (Ollama), Semantic search ("warm pads", "aggressive bass")
-- **Phase 3** (Future): Context-aware recommendations, Auto-deck generation, Collaborative filtering
-- **Phase 4** (Future): DAW integration, Project context detection, Real-time suggestions
+**Revised Phase Boundaries:**
+- **Phase 1** (Current - This Feature): 
+  - Card grid UI only
+  - Basic card display (name, developer, category, host)
+  - Auto-scan plugin directories
+  - Existing filters work with cards
+  - Simple hover effects
+  - **No** rarity, **no** decks, **no** complex animations
+  
+- **Phase 2** (Future): 
+  - Usage tracking + rarity visual effects
+  - Deck builder system
+  - "Surprise Me" discovery
+  - Flip animations
+  
+- **Phase 3** (Future): 
+  - Local LLM integration (Ollama)
+  - Semantic search ("warm pads", "aggressive bass")
+  - Auto-deck generation
+  
+- **Phase 4** (Future): 
+  - DAW integration
+  - Context detection
+  - Real-time suggestions
 
 ### Rationale
-1. **De-risk Development**: Prove card UI works before adding AI complexity
-2. **Iterative Approach**: Get user feedback on core experience first
-3. **Data Collection**: Need usage data to train/tune AI effectively
-4. **Technical Debt Avoidance**: Don't want to refactor AI integration if UI paradigm changes
-5. **Manageable Scope**: Each phase is shippable and valuable on its own
+1. **Validate Core Concept**: Is card UI actually better? Prove it before building on top
+2. **Exploratory Project**: Following creative intuition, not building production app yet
+3. **Reduce Risk**: Don't invest weeks in features if foundation doesn't work
+4. **Faster Feedback**: Get something visual working in days, not weeks
+5. **Data First**: Can't build usage-based features without usage data
 
 ### Consequences
-- **Positive:** Lower risk, faster initial delivery, clear milestones, easier testing
-- **Negative:** Full vision takes longer to realize, users might expect AI immediately
-- **Mitigation:** Be transparent about roadmap, ship Phase 1 as "MVP" with clear future plans
-
-### Technical Considerations
-- **Phase 2 Tech Stack**: Ollama (local LLM), vector embeddings for semantic search
-- **Phase 3 Tech Stack**: ML clustering for auto-deck generation, usage pattern analysis
-- **Phase 4 Tech Stack**: Electron IPC for DAW communication, file parsing for project context
+- **Positive:** Fast validation, clear go/no-go decisions, manageable scope
+- **Negative:** Full vision takes longer to realize
+- **Acceptable:** This is exploration, not shipping to users yet
 
 ---
 
@@ -353,18 +426,27 @@ Phase AI integration after core card UI is proven. Build foundation first, add i
 
 ## Status Summary
 
-**Legacy (Superseded):**
-- ADR-001: React Flow for Canvas - No longer primary interface, but kept for reference
-- GroupStore and TemplateStore - Replaced by DeckStore
+**Phase 1 (Current - In Progress):**
+- **ADR-009**: Card-Based UI - Replacing canvas completely
+- **ADR-010**: Auto-Scanning - Critical for Phase 1
+- **ADR-013**: Phased Development - Guiding principle
 
-**Active:**
+**Phase 2 (Deferred):**
+- **ADR-011**: Decks System - After card UI validated
+- **ADR-012**: Rarity System - After usage data collected
+
+**Legacy (Being Removed in Phase 1):**
+- ADR-001: React Flow - Canvas components will be deleted
+- CanvasStore - Being removed
+- GroupStore/TemplateStore - Kept for now, will merge in Phase 2
+
+**Active (Unchanged):**
 - ADR-002: Zustand - Still primary state management
 - ADR-003: LocalStorage - Still primary persistence
 - ADR-004: Electron - Still primary platform
-- ADR-005: Bidirectional Pairings - Kept, but less prominent in card UI
+- ADR-005: Bidirectional Pairings - Kept, less prominent in card UI
 - ADR-006: Modular Documentation - Still enforced
 - ADR-007: shadcn/ui - Still primary component library
 - ADR-008: TypeScript Strict - Still enforced
-- ADR-009-012: Card Collection Pivot - **Active development**
 
 

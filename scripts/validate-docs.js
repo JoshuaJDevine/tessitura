@@ -28,6 +28,7 @@ const IGNORE_PATTERNS = [
   /\.spec\./,
   /\.types\./,
   /\.stories\./,
+  /\.d\.ts$/, // TypeScript declaration files (auto-generated)
   /\\ui\\/, // UI components don't need docs (shadcn/ui) - Windows path
   /\/ui\//, // UI components don't need docs (shadcn/ui) - Unix path
   /main\.tsx$/,
