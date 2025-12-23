@@ -1,17 +1,21 @@
 # InstrumentCard
 
-**Last Updated:** 2025-12-23 - Created for card collection interface
+**Last Updated:** 2025-12-24 - Added interactive features: rarity system, context menu, quick actions
 
 ## Purpose
 
-Displays an instrument as a visually appealing card with gradient background, category badge, host badge, and hover effects. Designed to make browsing plugins feel fun and engaging, inspired by card collection interfaces like Hearthstone.
+Displays an instrument as a visually appealing card with gradient background, category badge, host badge, hover effects, and interactive features. Designed to make browsing plugins feel fun and engaging, inspired by card collection interfaces like Hearthstone. Cards now include usage-based visual rarity, right-click context menu, and quick "Mark as Used" action.
 
 ## Dependencies
 
 - `@/types` - Instrument type definition
 - `@/components/ui/badge` - Badge components for category and host
+- `@/components/ui/dropdown-menu` - DropdownMenuTrigger for context menu
 - `@/lib/utils` - cn utility for className merging
-- `./InstrumentCard.module.css` - CSS module for gradient backgrounds and animations
+- `@/lib/rarity` - `getRarityTier` function for usage-based rarity calculation
+- `./InstrumentCardContextMenu` - Context menu component for card actions
+- `lucide-react` - Icons (Star, Check)
+- `./InstrumentCard.module.css` - CSS module for gradient backgrounds, animations, and rarity styles
 
 ## Props/API
 
@@ -21,6 +25,8 @@ interface InstrumentCardProps {
   isSelected: boolean;           // Whether this card is selected
   viewDensity: 'compact' | 'spacious';  // Card size variant
   onSelect: (id: string) => void; // Callback when card is clicked
+  onMarkAsUsed?: (id: string) => void; // Optional callback when marking as used
+  showUsageBadge?: boolean;      // Optional: show usage count badge (default: false)
 }
 ```
 
@@ -75,10 +81,23 @@ function MyComponent() {
 - Other: Blue-cyan gradient (#4facfe → #00f2fe)
 
 **Interactions:**
-- Hover: Scale to 1.03, increased shadow (200ms transition)
+- Hover: Scale to 1.03, increased shadow (200ms transition), quick action button appears
 - Click: Toggles selection state
+- Right-click: Opens context menu (Mark as Used, Edit, Delete)
+- Quick Action Button: Hover button in top-right corner to mark as used
 - Keyboard: Enter/Space key support for accessibility
 - Selected: Outline highlight with primary color
+
+**Rarity Visual Effects:**
+- **Common** (0-4 uses): Standard appearance, no special effects
+- **Rare** (5-19 uses): Blue border highlight (#3b82f6)
+- **Epic** (20-49 uses): Purple border with glow effect, pulse animation
+- **Legendary** (50+ uses): Gold border with shimmer animation and subtle glow
+
+**Visual Feedback:**
+- Success animation when marking as used (scale pulse, 400ms)
+- Quick action button shows checkmark icon when marking
+- Rarity updates immediately if usage count crosses tier threshold
 
 ## Accessibility
 
@@ -111,12 +130,46 @@ This component is **presentational** - it doesn't manage any state itself. All s
 - `CollectionHeader` - Controls view density setting
 - `uiStore` - Manages selection and view state
 
+## Rarity System
+
+Cards display visual rarity based on usage count from `instrument.metadata.usageCount`:
+
+- Calculated using `getRarityTier()` utility function
+- Visual effects applied via CSS classes
+- Updates immediately when usage count changes
+- Legendary cards have animated shimmer effect (3s infinite)
+- Epic cards have pulsing glow effect (2s infinite)
+
+## Context Menu
+
+Right-click on any card to access:
+- **Mark as Used** - Increments usage count and updates rarity
+- **Edit** - Opens edit dialog for the instrument
+- **Delete** - Shows confirmation dialog, then deletes instrument
+
+The context menu uses shadcn/ui DropdownMenu for accessibility and consistent styling.
+
+## Quick Action Button
+
+A hover-overlay button appears in the top-right corner of cards:
+- Only visible on hover (smooth fade-in)
+- Click to mark instrument as used
+- Shows checkmark icon when marking
+- Triggers success animation on completion
+
+## Usage Badge
+
+Optional usage count badge (bottom-right corner):
+- Only visible if `showUsageBadge={true}` prop is set
+- Shows current usage count number
+- Hidden by default (can be enabled in future settings)
+
 ## Future Enhancements
 
-- Flip animation on hover (Phase 2)
-- Rarity effects (legendary/epic/rare/common) (Phase 2)
-- Usage count indicator
+- Flip animation on hover (Phase 2.1)
 - Custom card images/thumbnails
 - Quick preview modal on hover
 - Drag-to-deck functionality
+- Time-based decay effects (instruments get "dusty" if unused)
+- Per-category rarity tiers
 

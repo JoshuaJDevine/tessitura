@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useCallback } from 'react';
 import { useInstrumentStore } from '@/store/instrumentStore';
 import { useUIStore } from '@/store/uiStore';
 import { InstrumentCard } from './InstrumentCard';
@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { FolderOpen, Search } from 'lucide-react';
 
 export function CollectionView() {
-  const { instruments } = useInstrumentStore();
+  const { instruments, markAsUsed } = useInstrumentStore();
   const {
     searchQuery,
     selectedCategories,
@@ -77,6 +77,13 @@ export function CollectionView() {
     return sorted;
   }, [instruments, searchQuery, selectedCategories, selectedHosts, collectionView.sortBy]);
 
+  const handleMarkAsUsed = useCallback(
+    (id: string) => {
+      markAsUsed(id);
+    },
+    [markAsUsed]
+  );
+
   // Empty state
   if (filteredInstruments.length === 0) {
     return (
@@ -115,6 +122,7 @@ export function CollectionView() {
               isSelected={collectionView.selectedCardIds.includes(instrument.id)}
               viewDensity={collectionView.viewDensity}
               onSelect={toggleCardSelection}
+              onMarkAsUsed={handleMarkAsUsed}
             />
           ))}
         </div>
