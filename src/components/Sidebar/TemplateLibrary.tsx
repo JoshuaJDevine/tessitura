@@ -2,7 +2,6 @@ import { useTemplateStore } from '@/store/templateStore';
 import { useInstrumentStore } from '@/store/instrumentStore';
 import { useCanvasStore } from '@/store/canvasStore';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Plus, Trash2, Play } from 'lucide-react';
 import {
   Dialog,
@@ -28,9 +27,7 @@ export function TemplateLibrary() {
   const handleCreateTemplate = () => {
     if (!templateName.trim()) return;
 
-    const selectedInstruments = instruments.filter((inst) =>
-      selectedNodeIds.includes(inst.id)
-    );
+    const selectedInstruments = instruments.filter((inst) => selectedNodeIds.includes(inst.id));
 
     if (selectedInstruments.length === 0) {
       alert('Please select at least one instrument to create a template');
@@ -57,7 +54,10 @@ export function TemplateLibrary() {
     // Remove duplicates
     const uniquePairings = pairings.filter(
       (p, index, self) =>
-        index === self.findIndex((t) => (t.from === p.from && t.to === p.to) || (t.from === p.to && t.to === p.from))
+        index ===
+        self.findIndex(
+          (t) => (t.from === p.from && t.to === p.to) || (t.from === p.to && t.to === p.from)
+        )
     );
 
     addTemplate({
@@ -104,11 +104,7 @@ export function TemplateLibrary() {
                 </p>
               </div>
               <div className="flex gap-1">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => loadTemplate(template.id)}
-                >
+                <Button variant="ghost" size="sm" onClick={() => loadTemplate(template.id)}>
                   <Play className="h-4 w-4" />
                 </Button>
                 <Button
@@ -132,9 +128,7 @@ export function TemplateLibrary() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Create Template</DialogTitle>
-            <DialogDescription>
-              Save the current selection as a reusable template
-            </DialogDescription>
+            <DialogDescription>Save the current selection as a reusable template</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
@@ -174,4 +168,3 @@ export function TemplateLibrary() {
     </div>
   );
 }
-

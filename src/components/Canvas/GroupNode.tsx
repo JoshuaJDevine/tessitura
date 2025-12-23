@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { Handle, Position, NodeProps } from 'reactflow';
+import { NodeProps } from 'reactflow';
 import { InstrumentGroup } from '@/types';
 import { Badge } from '@/components/ui/badge';
 import { ChevronDown, ChevronRight } from 'lucide-react';
@@ -44,7 +44,7 @@ export const GroupNode = memo(({ data, selected }: NodeProps<GroupNodeData>) => 
           {group.instruments.length} instruments
         </Badge>
       </div>
-      
+
       {!group.collapsed && group.description && (
         <p className="mt-2 text-sm text-muted-foreground">{group.description}</p>
       )}
@@ -53,4 +53,3 @@ export const GroupNode = memo(({ data, selected }: NodeProps<GroupNodeData>) => 
 });
 
 GroupNode.displayName = 'GroupNode';
-

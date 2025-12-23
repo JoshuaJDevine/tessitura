@@ -17,7 +17,7 @@ interface ContextMenuProps {
 
 export function ContextMenu({ instrumentId, children }: ContextMenuProps) {
   const { openEditInstrument } = useUIStore();
-  const { deleteInstrument, markAsUsed, createPairing } = useInstrumentStore();
+  const { deleteInstrument, markAsUsed } = useInstrumentStore();
   const { selectedNodeIds } = useCanvasStore();
 
   const handleEdit = () => {
@@ -67,4 +67,3 @@ export function ContextMenu({ instrumentId, children }: ContextMenuProps) {
     </DropdownMenu>
   );
 }
-

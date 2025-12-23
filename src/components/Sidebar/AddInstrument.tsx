@@ -24,13 +24,36 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 
 const HOSTS: Host[] = ['Kontakt', 'Standalone', 'VST3', 'AU', 'Soundbox', 'SINE', 'Opus', 'Other'];
-const CATEGORIES: Category[] = ['Orchestral', 'Synth', 'Drums', 'Effects', 'Keys', 'World', 'Vocal', 'Other'];
-const COMMON_TAGS = ['GO-TO', 'Hidden Gem', 'Specialty', 'Lo-Fi', 'Experimental', 'Cinematic', 'Ambient'];
+const CATEGORIES: Category[] = [
+  'Orchestral',
+  'Synth',
+  'Drums',
+  'Effects',
+  'Keys',
+  'World',
+  'Vocal',
+  'Other',
+];
+const COMMON_TAGS = [
+  'GO-TO',
+  'Hidden Gem',
+  'Specialty',
+  'Lo-Fi',
+  'Experimental',
+  'Cinematic',
+  'Ambient',
+];
 
 export function AddInstrument() {
-  const { isAddInstrumentOpen, isEditInstrumentOpen, editingInstrumentId, closeAddInstrument, closeEditInstrument } = useUIStore();
+  const {
+    isAddInstrumentOpen,
+    isEditInstrumentOpen,
+    editingInstrumentId,
+    closeAddInstrument,
+    closeEditInstrument,
+  } = useUIStore();
   const { addInstrument, updateInstrument, getInstrument } = useInstrumentStore();
-  
+
   const editingInstrument = editingInstrumentId ? getInstrument(editingInstrumentId) : null;
   const isOpen = isAddInstrumentOpen || isEditInstrumentOpen;
 
@@ -39,21 +62,25 @@ export function AddInstrument() {
     developer: editingInstrument?.developer || '',
     host: (editingInstrument?.host || 'Other') as Host,
     category: (editingInstrument?.category || 'Other') as Category,
-    tags: editingInstrument?.tags || [] as string[],
+    tags: editingInstrument?.tags || ([] as string[]),
     notes: editingInstrument?.notes || '',
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (editingInstrument) {
       updateInstrument(editingInstrument.id, formData);
       closeEditInstrument();
     } else {
-      addInstrument(formData);
+      addInstrument({
+        ...formData,
+        color: '#3b82f6',
+        pairings: [],
+      });
       closeAddInstrument();
     }
-    
+
     // Reset form
     setFormData({
       name: '',
@@ -68,9 +95,7 @@ export function AddInstrument() {
   const toggleTag = (tag: string) => {
     setFormData((prev) => ({
       ...prev,
-      tags: prev.tags.includes(tag)
-        ? prev.tags.filter((t) => t !== tag)
-        : [...prev.tags, tag],
+      tags: prev.tags.includes(tag) ? prev.tags.filter((t) => t !== tag) : [...prev.tags, tag],
     }));
   };
 
@@ -115,7 +140,7 @@ export function AddInstrument() {
               : 'Add a new instrument or plugin to your library.'}
           </DialogDescription>
         </DialogHeader>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">Name *</Label>
@@ -219,4 +244,3 @@ export function AddInstrument() {
     </Dialog>
   );
 }
-

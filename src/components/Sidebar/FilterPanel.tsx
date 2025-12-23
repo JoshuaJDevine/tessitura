@@ -9,7 +9,16 @@ import { Badge } from '@/components/ui/badge';
 import { Search, X, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-const CATEGORIES: Category[] = ['Orchestral', 'Synth', 'Drums', 'Effects', 'Keys', 'World', 'Vocal', 'Other'];
+const CATEGORIES: Category[] = [
+  'Orchestral',
+  'Synth',
+  'Drums',
+  'Effects',
+  'Keys',
+  'World',
+  'Vocal',
+  'Other',
+];
 const HOSTS: Host[] = ['Kontakt', 'Standalone', 'VST3', 'AU', 'Soundbox', 'SINE', 'Opus', 'Other'];
 
 export function FilterPanel() {
@@ -26,12 +35,10 @@ export function FilterPanel() {
     setSuggestedInstrument,
   } = useUIStore();
 
-  const { instruments, getInstrument } = useInstrumentStore();
+  const { instruments } = useInstrumentStore();
 
   // Get all unique tags from instruments
-  const allTags = Array.from(
-    new Set(instruments.flatMap((inst) => inst.tags))
-  ).sort();
+  const allTags = Array.from(new Set(instruments.flatMap((inst) => inst.tags))).sort();
 
   const hasActiveFilters =
     searchQuery ||
@@ -156,37 +163,25 @@ export function FilterPanel() {
             {searchQuery && (
               <Badge variant="secondary" className="gap-1">
                 Search: {searchQuery}
-                <X
-                  className="h-3 w-3 cursor-pointer"
-                  onClick={() => setSearchQuery('')}
-                />
+                <X className="h-3 w-3 cursor-pointer" onClick={() => setSearchQuery('')} />
               </Badge>
             )}
             {selectedTags.map((tag) => (
               <Badge key={tag} variant="secondary" className="gap-1">
                 {tag}
-                <X
-                  className="h-3 w-3 cursor-pointer"
-                  onClick={() => toggleTag(tag)}
-                />
+                <X className="h-3 w-3 cursor-pointer" onClick={() => toggleTag(tag)} />
               </Badge>
             ))}
             {selectedCategories.map((cat) => (
               <Badge key={cat} variant="secondary" className="gap-1">
                 {cat}
-                <X
-                  className="h-3 w-3 cursor-pointer"
-                  onClick={() => toggleCategory(cat)}
-                />
+                <X className="h-3 w-3 cursor-pointer" onClick={() => toggleCategory(cat)} />
               </Badge>
             ))}
             {selectedHosts.map((host) => (
               <Badge key={host} variant="secondary" className="gap-1">
                 {host}
-                <X
-                  className="h-3 w-3 cursor-pointer"
-                  onClick={() => toggleHost(host)}
-                />
+                <X className="h-3 w-3 cursor-pointer" onClick={() => toggleHost(host)} />
               </Badge>
             ))}
           </div>
@@ -194,11 +189,7 @@ export function FilterPanel() {
       )}
 
       <div className="mt-auto pt-4">
-        <Button
-          variant="outline"
-          className="w-full"
-          onClick={getRandomSuggestion}
-        >
+        <Button variant="outline" className="w-full" onClick={getRandomSuggestion}>
           <Sparkles className="mr-2 h-4 w-4" />
           Surprise Me
         </Button>
@@ -206,4 +197,3 @@ export function FilterPanel() {
     </div>
   );
 }
-

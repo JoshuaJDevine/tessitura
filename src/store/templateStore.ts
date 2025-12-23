@@ -49,17 +49,16 @@ export const useTemplateStore = create<TemplateStore>()(
         if (!template) return;
 
         const { useInstrumentStore } = require('@/store/instrumentStore');
-        const { useCanvasStore } = require('@/store/canvasStore');
         const instrumentStore = useInstrumentStore.getState();
-        const canvasStore = useCanvasStore.getState();
 
         // Get current viewport center for placement
         const viewportCenter = { x: 400, y: 300 }; // Default, could be improved with ReactFlow instance
 
         // Create instruments from template
-        template.instruments.forEach((instrumentId, index) => {
-          // In a real implementation, we'd need to store instrument data in template
-          // For now, this is a placeholder
+        // In a real implementation, we'd need to store instrument data in template
+        // For now, this is a placeholder
+        template.instruments.forEach(() => {
+          // Placeholder for future implementation
         });
 
         // Create pairings
@@ -83,4 +82,3 @@ export const useTemplateStore = create<TemplateStore>()(
     }
   )
 );
-

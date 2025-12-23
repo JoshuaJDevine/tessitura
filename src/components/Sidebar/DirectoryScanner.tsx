@@ -17,7 +17,9 @@ declare global {
   interface Window {
     electronAPI?: {
       selectDirectory: () => Promise<string | null>;
-      scanDirectory: (path: string) => Promise<Array<{ name: string; path: string; isDirectory: boolean }>>;
+      scanDirectory: (
+        path: string
+      ) => Promise<Array<{ name: string; path: string; isDirectory: boolean }>>;
     };
   }
 }
@@ -46,7 +48,7 @@ export function DirectoryScanner() {
     // "Spitfire Audio - BBC Symphony Orchestra"
     // "Native Instruments - Kontakt Factory Library"
     // "Arturia - Pigments"
-    
+
     const parts = name.split(' - ');
     if (parts.length >= 2) {
       return {
@@ -72,28 +74,36 @@ export function DirectoryScanner() {
   const detectHost = (path: string, name: string): Host => {
     const lowerPath = path.toLowerCase();
     const lowerName = name.toLowerCase();
-    
+
     if (lowerPath.includes('kontakt') || lowerName.includes('kontakt')) return 'Kontakt';
     if (lowerPath.includes('soundbox') || lowerName.includes('soundbox')) return 'Soundbox';
     if (lowerPath.includes('sine') || lowerName.includes('sine')) return 'SINE';
     if (lowerPath.includes('opus') || lowerName.includes('opus')) return 'Opus';
     if (lowerPath.includes('vst') || lowerName.includes('vst')) return 'VST3';
     if (lowerPath.includes('.component') || lowerName.includes('au')) return 'AU';
-    
+
     return 'Other';
   };
 
   const detectCategory = (name: string): Category => {
     const lower = name.toLowerCase();
-    
-    if (lower.includes('orchestr') || lower.includes('string') || lower.includes('brass') || lower.includes('woodwind')) return 'Orchestral';
+
+    if (
+      lower.includes('orchestr') ||
+      lower.includes('string') ||
+      lower.includes('brass') ||
+      lower.includes('woodwind')
+    )
+      return 'Orchestral';
     if (lower.includes('synth') || lower.includes('synthesizer')) return 'Synth';
     if (lower.includes('drum') || lower.includes('percussion')) return 'Drums';
     if (lower.includes('piano') || lower.includes('key')) return 'Keys';
-    if (lower.includes('vocal') || lower.includes('choir') || lower.includes('voice')) return 'Vocal';
+    if (lower.includes('vocal') || lower.includes('choir') || lower.includes('voice'))
+      return 'Vocal';
     if (lower.includes('world') || lower.includes('ethnic')) return 'World';
-    if (lower.includes('effect') || lower.includes('reverb') || lower.includes('delay')) return 'Effects';
-    
+    if (lower.includes('effect') || lower.includes('reverb') || lower.includes('delay'))
+      return 'Effects';
+
     return 'Other';
   };
 
@@ -109,7 +119,7 @@ export function DirectoryScanner() {
 
       setIsScanning(true);
       const items = await window.electronAPI.scanDirectory(dirPath);
-      
+
       // Parse items
       const parsed: ScannedItem[] = items
         .filter((item) => item.isDirectory) // Only directories for now
@@ -138,7 +148,7 @@ export function DirectoryScanner() {
 
   const handleImport = () => {
     const itemsToImport = scannedItems.filter((item) => selectedItems.has(item.path));
-    
+
     itemsToImport.forEach((item) => {
       if (item.parsed) {
         addInstrument({
@@ -148,6 +158,8 @@ export function DirectoryScanner() {
           category: item.parsed.category || 'Other',
           tags: [],
           notes: `Imported from: ${item.path}`,
+          color: '#3b82f6',
+          pairings: [],
         });
       }
     });
@@ -195,10 +207,11 @@ export function DirectoryScanner() {
           <DialogHeader>
             <DialogTitle>Import Instruments</DialogTitle>
             <DialogDescription>
-              Review and select instruments to import. {selectedItems.size} of {scannedItems.length} selected.
+              Review and select instruments to import. {selectedItems.size} of {scannedItems.length}{' '}
+              selected.
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-2 max-h-96 overflow-y-auto">
             {scannedItems.map((item) => (
               <div
@@ -249,4 +262,3 @@ export function DirectoryScanner() {
     </div>
   );
 }
-

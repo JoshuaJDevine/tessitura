@@ -8,27 +8,33 @@ export function Analytics() {
   const { instruments } = useInstrumentStore();
 
   const stats = useMemo(() => {
+    const now = Date.now(); // Capture current time once
     const total = instruments.length;
     const used = instruments.filter((inst) => inst.metadata.usageCount > 0).length;
     const neverUsed = instruments.filter((inst) => !inst.metadata.lastUsed).length;
-    
+
     const mostUsed = [...instruments]
       .sort((a, b) => b.metadata.usageCount - a.metadata.usageCount)
       .slice(0, 5);
-    
+
     const leastUsed = [...instruments]
       .filter((inst) => inst.metadata.lastUsed)
-      .sort((a, b) => {
-        const aDays = (Date.now() - a.metadata.lastUsed!.getTime()) / (1000 * 60 * 60 * 24);
-        const bDays = (Date.now() - b.metadata.lastUsed!.getTime()) / (1000 * 60 * 60 * 24);
-        return bDays - aDays;
-      })
+      .map((inst) => ({
+        ...inst,
+        lastUsedDaysAgo: Math.floor(
+          (now - inst.metadata.lastUsed!.getTime()) / (1000 * 60 * 60 * 24)
+        ),
+      }))
+      .sort((a, b) => b.lastUsedDaysAgo - a.lastUsedDaysAgo)
       .slice(0, 5);
 
-    const byCategory = instruments.reduce((acc, inst) => {
-      acc[inst.category] = (acc[inst.category] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    const byCategory = instruments.reduce(
+      (acc, inst) => {
+        acc[inst.category] = (acc[inst.category] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
 
     return {
       total,
@@ -87,9 +93,7 @@ export function Analytics() {
           </div>
           <div className="space-y-1">
             {stats.leastUsed.map((inst) => {
-              const daysAgo = Math.floor(
-                (Date.now() - inst.metadata.lastUsed!.getTime()) / (1000 * 60 * 60 * 24)
-              );
+              const daysAgo = inst.lastUsedDaysAgo || 0;
               return (
                 <div key={inst.id} className="flex items-center justify-between text-xs">
                   <span className="truncate">{inst.name}</span>
@@ -117,4 +121,3 @@ export function Analytics() {
     </div>
   );
 }
-
