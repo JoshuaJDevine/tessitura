@@ -15,7 +15,4 @@ function App() {
   );
 }
 
-// TEST
-// Test workflow
-
 export default App;
