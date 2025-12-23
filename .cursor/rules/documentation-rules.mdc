@@ -1,0 +1,66 @@
+# Documentation Template
+
+Use this template when creating .md files for components, hooks, or stores:
+
+```markdown
+# [Name]
+
+**Last Updated:** [YYYY-MM-DD] - [Reason for update]
+
+## Purpose
+
+[Clear description of what this module does and why it exists. 2-3 sentences.]
+
+## Dependencies
+
+- `dependency-name` - [What it's used for]
+- `another-dependency` - [What it's used for]
+
+## Props/API
+
+```typescript
+interface Props {
+  /** Description of prop */
+  propName: string;
+  /** Description of optional prop */
+  optionalProp?: number;
+}
+```
+
+## Usage Example
+
+```tsx
+import { ComponentName } from './ComponentName';
+
+function Example() {
+  return (
+    <ComponentName 
+      propName="value"
+      optionalProp={42}
+    />
+  );
+}
+```
+
+## State Management
+
+[Describe what state this manages, how it's stored, and how it's updated. If it doesn't manage state, say "No internal state."]
+
+## Related Components
+
+- `RelatedComponent` - [How they relate]
+- `AnotherComponent` - [How they relate]
+
+## Future Enhancements
+
+- [ ] Planned feature 1
+- [ ] Planned feature 2
+```
+
+## Tips
+
+- Keep descriptions concise but complete
+- Update "Last Updated" every time you modify the file
+- Include realistic usage examples
+- Link to related components
+- Document edge cases and gotchas

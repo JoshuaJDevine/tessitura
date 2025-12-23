@@ -1,0 +1,13 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Generate documentation update prompts for changed files
+echo "📝 Generating documentation review prompts..."
+npm run docs:prompt
+
+if [ -f ".cursor/doc-tasks.md" ]; then
+  echo ""
+  echo "💡 Documentation tasks generated!"
+  echo "📋 Review .cursor/doc-tasks.md for any needed updates"
+fi
+

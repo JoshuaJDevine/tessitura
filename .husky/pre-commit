@@ -1,0 +1,32 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🔍 Running pre-commit checks..."
+
+# Check documentation completeness
+echo "📝 Validating documentation..."
+npm run docs:validate
+
+if [ $? -ne 0 ]; then
+  echo ""
+  echo "❌ Documentation validation failed!"
+  echo "💡 Please ensure all components/hooks/stores have corresponding .md files"
+  echo "📖 See .cursor/rules/documentation-rules.mdc for template"
+  exit 1
+fi
+
+# Type check
+echo "🔎 Running TypeScript type check..."
+npm run type-check
+
+if [ $? -ne 0 ]; then
+  echo ""
+  echo "❌ TypeScript type check failed!"
+  exit 1
+fi
+
+# Lint staged files
+echo "✨ Linting staged files..."
+npx lint-staged
+
+echo "✅ Pre-commit checks passed!"

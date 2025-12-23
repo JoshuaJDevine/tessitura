@@ -1,0 +1,381 @@
+# Music Plugin Organizer - Development Rules
+
+## Agent Roles
+
+This project uses multiple agent roles for different tasks:
+- **@coder** - Implementation and feature development
+- **@docs** - Documentation updates and maintenance
+- **@architect** - Architecture decisions and design reviews
+
+## Self-Documenting Architecture
+
+### Core Principle
+Every module must document itself. Code and documentation are updated together, never separately.
+
+### Documentation Requirements
+
+#### Every Component/Hook/Store Must Have:
+1. **Corresponding .md file** in the same directory
+2. **JSDoc comments** for all exported functions/components
+3. **TypeScript types** for all props, parameters, and return values
+4. **Usage examples** in the .md file
+
+#### .md File Structure
+Each .md file must contain:
+```markdown
+# [Component/Hook/Store Name]
+
+**Last Updated:** [YYYY-MM-DD] - [Reason for update]
+
+## Purpose
+[What it does and why it exists]
+
+## Dependencies
+- [List of imports and what they're used for]
+
+## Props/API
+[TypeScript interface with descriptions]
+
+## Usage Example
+[Code example showing how to use it]
+
+## State Management
+[What state it manages and how]
+
+## Related Components
+[What it connects to or works with]
+
+## Future Enhancements
+[Planned improvements]
+```
+
+### File Size Limits
+- **Components:** <250 lines (split if larger)
+- **Hooks:** <150 lines (split if larger)
+- **Stores:** <300 lines (split if larger)
+- **Utilities:** <200 lines (split if larger)
+
+If exceeding limits, refactor into smaller, focused modules.
+
+### Code Quality Standards
+
+#### TypeScript
+- **Strict mode enabled** - no `any` types without justification
+- **Explicit return types** for all functions
+- **Interface over type** for object shapes
+- **Enums for constants** with multiple related values
+
+#### React
+- **Functional components only** - no class components
+- **Custom hooks** for reusable logic
+- **Memoization** for expensive computations
+- **Proper dependency arrays** in useEffect/useMemo/useCallback
+
+#### Naming Conventions
+- **Components:** PascalCase (e.g., `InstrumentNode.tsx`)
+- **Hooks:** camelCase with `use` prefix (e.g., `useKeyboardShortcuts.ts`)
+- **Stores:** camelCase with `Store` suffix (e.g., `instrumentStore.ts`)
+- **Utilities:** camelCase (e.g., `formatDate.ts`)
+- **Types:** PascalCase (e.g., `Instrument`, `Template`)
+- **Constants:** UPPER_SNAKE_CASE (e.g., `MAX_INSTRUMENTS`)
+
+### Before Committing
+
+#### Required Checks:
+1. ✅ Run `npm run docs:validate` - ensures all files have documentation
+2. ✅ Run `npm run type-check` - TypeScript compilation succeeds
+3. ✅ Run `npm run lint` - ESLint passes
+4. ✅ Update CHANGELOG.md - for user-facing changes
+5. ✅ Update architecture docs - for architectural changes
+
+#### Git Commit Message Format:
+```
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
+```
+
+**Types:**
+- `feat` - New feature
+- `fix` - Bug fix
+- `docs` - Documentation only
+- `style` - Code style changes (formatting)
+- `refactor` - Code refactoring
+- `test` - Adding tests
+- `chore` - Build process or auxiliary tool changes
+
+**Examples:**
+```
+feat(canvas): add zoom to fit selected nodes
+
+Implements zoom animation when user selects multiple nodes
+and presses Ctrl+F. Uses React Flow's fitView with padding.
+
+Closes #42
+```
+
+```
+docs(instrument-node): update usage examples
+
+Added examples for custom styling and event handling.
+Updated props documentation with new optional fields.
+```
+
+### Architecture Decision Records (ADRs)
+
+#### When to Create an ADR:
+- Choosing between significant technical alternatives
+- Making decisions that affect multiple components
+- Introducing new patterns or paradigms
+- Changing existing architectural patterns
+
+#### ADR Format:
+```markdown
+## ADR-XXX: [Decision Title]
+
+**Date:** YYYY-MM-DD
+**Status:** [Proposed | Accepted | Deprecated | Superseded]
+
+### Context
+[The situation and problem]
+
+### Decision
+[What we decided to do]
+
+### Rationale
+[Why we made this decision]
+
+### Consequences
+- **Positive:** [Benefits]
+- **Negative:** [Drawbacks]
+- **Mitigation:** [How we address drawbacks]
+
+### Alternatives Considered
+[Other options we evaluated]
+```
+
+Add ADRs to `docs/architecture/decisions.md`
+
+### Component Development Workflow
+
+#### Creating a New Component:
+
+1. **Plan First:**
+   - What problem does it solve?
+   - What are its dependencies?
+   - What state does it need?
+   - How will it be tested?
+
+2. **Create Files:**
+   ```
+   ComponentName.tsx
+   ComponentName.md
+   ComponentName.test.tsx (if complex logic)
+   ```
+
+3. **Implement:**
+   - Write TypeScript interface first
+   - Add JSDoc comments
+   - Implement component
+   - Add usage example to .md
+
+4. **Document:**
+   - Fill out all sections of .md file
+   - Update related component docs
+   - Update architecture docs if needed
+
+5. **Validate:**
+   - Run `npm run docs:validate`
+   - Run `npm run type-check`
+   - Test the component
+
+### Store Development Workflow
+
+Stores use Zustand and follow this pattern:
+
+```typescript
+/**
+ * [Store Name] Store
+ * 
+ * [Description of what this store manages]
+ */
+
+interface [StoreName]State {
+  // State properties
+  items: Item[];
+  
+  // Actions
+  addItem: (item: Item) => void;
+  removeItem: (id: string) => void;
+  updateItem: (id: string, updates: Partial<Item>) => void;
+}
+
+export const use[StoreName]Store = create<[StoreName]State>()(
+  persist(
+    (set, get) => ({
+      // Initial state
+      items: [],
+      
+      // Actions
+      addItem: (item) => set((state) => ({
+        items: [...state.items, item]
+      })),
+      
+      // ... more actions
+    }),
+    {
+      name: '[store-name]-storage',
+    }
+  )
+);
+```
+
+### UI Component Guidelines
+
+#### shadcn/ui Components (in `src/components/ui/`)
+- **Do not modify** unless absolutely necessary
+- **Do not add .md files** - these are third-party components
+- If customization needed, create wrapper component
+
+#### Custom Components
+- **Always document** with .md file
+- **Use shadcn/ui primitives** when possible
+- **Follow accessibility guidelines** (ARIA labels, keyboard navigation)
+- **Support dark theme** (use Tailwind dark: variants)
+
+### Testing Strategy
+
+#### Unit Tests (Future):
+- Complex business logic
+- Utility functions
+- Custom hooks
+
+#### Integration Tests (Future):
+- Component interactions
+- Store operations
+- Canvas operations
+
+#### E2E Tests (Future):
+- Critical user flows
+- Cross-platform compatibility
+
+### Performance Guidelines
+
+#### React Performance:
+- Use `useMemo` for expensive computations
+- Use `useCallback` for event handlers passed to children
+- Use `React.memo` for components that re-render frequently
+- Avoid inline object/array creation in render
+
+#### Canvas Performance:
+- Limit visible nodes (React Flow handles this)
+- Memoize node data transformations
+- Debounce search/filter operations
+- Use virtual scrolling for large lists
+
+### Accessibility Requirements
+
+- **Keyboard navigation** for all interactive elements
+- **ARIA labels** for icon buttons
+- **Focus indicators** visible and clear
+- **Color contrast** meets WCAG AA standards
+- **Screen reader support** for critical features
+
+### Error Handling
+
+#### User-Facing Errors:
+- Show toast notifications for errors
+- Provide actionable error messages
+- Log errors to console for debugging
+
+#### Development Errors:
+- Throw errors early for invalid states
+- Use TypeScript to prevent type errors
+- Add runtime validation for external data
+
+### Security Considerations
+
+- **No sensitive data** in localStorage (future: encrypt if needed)
+- **Sanitize file paths** from directory scanner
+- **Validate imported data** structure
+- **No eval() or dangerous patterns**
+
+### Future-Proofing
+
+#### Planned Migrations:
+- **Phase 2:** IndexedDB for larger datasets
+- **Phase 3:** Electron IPC for file system operations
+- **Phase 4:** Plugin scanning automation
+- **Phase 5:** Cloud sync (optional)
+
+Keep these in mind when making architectural decisions.
+
+### Agent-Specific Instructions
+
+#### @coder Agent:
+When implementing features:
+1. Read related .md files for context
+2. Follow TypeScript strict mode
+3. Add JSDoc comments
+4. Keep files under size limits
+5. Create .md file if new component
+6. Update existing .md if modifying component
+
+#### @docs Agent:
+When updating documentation:
+1. Read the code file first
+2. Update corresponding .md file
+3. Ensure examples are current
+4. Update "Last Updated" with date and reason
+5. Check if architecture docs need updates
+6. Verify all sections are complete
+
+#### @architect Agent:
+When reviewing architecture:
+1. Check if decision warrants an ADR
+2. Review for consistency with existing patterns
+3. Identify potential breaking changes
+4. Suggest refactoring opportunities
+5. Update architecture documentation
+6. Consider future migration paths
+
+### Quick Reference
+
+#### Common Commands:
+```bash
+npm run dev                 # Start development server
+npm run electron:dev        # Start Electron app
+npm run docs:validate       # Check documentation completeness
+npm run type-check          # Run TypeScript compiler
+npm run lint                # Run ESLint
+npm run build               # Build for production
+```
+
+#### File Locations:
+- Components: `src/components/`
+- Hooks: `src/hooks/`
+- Stores: `src/store/`
+- Types: `src/types/`
+- Utils: `src/lib/`
+- Architecture docs: `docs/architecture/`
+- Scripts: `scripts/`
+
+### Questions to Ask Before Coding
+
+1. **Does this already exist?** Check existing components/hooks
+2. **Is this the right place?** Verify file organization
+3. **What are the dependencies?** Minimize coupling
+4. **How will this scale?** Consider performance
+5. **Is this testable?** Design for testability
+6. **Is this documented?** Plan documentation structure
+
+---
+
+## Summary
+
+**Remember:** Code and documentation are created together. If you write code without documentation, it doesn't exist. If you write documentation without updating code, it's wrong. They are one.
+
+**Goal:** In 6 months, any agent (or human) should be able to understand any part of this codebase by reading the .md files and architecture docs.
+
