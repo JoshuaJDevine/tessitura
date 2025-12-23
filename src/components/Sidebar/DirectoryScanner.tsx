@@ -242,7 +242,11 @@ export function DirectoryScanner() {
                 <input
                   type="checkbox"
                   checked={selectedItems.has(item.path)}
-                  onChange={() => toggleItem(item.path)}
+                  onChange={(e) => {
+                    e.stopPropagation();
+                    toggleItem(item.path);
+                  }}
+                  onClick={(e) => e.stopPropagation()}
                   className="ml-4"
                 />
               </div>
