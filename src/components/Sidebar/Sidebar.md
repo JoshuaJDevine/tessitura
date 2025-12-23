@@ -1,6 +1,6 @@
 # Sidebar
 
-**Last Updated:** 2024-12-22 - Initial documentation
+**Last Updated:** 2024-12-22 - Improved spacing between sections
 
 ## Purpose
 
@@ -41,6 +41,14 @@ function App() {
 No internal state. Uses `useUIStore` to trigger add instrument dialog.
 
 All child components manage their own state and interactions.
+
+## Layout & Spacing
+
+The sidebar uses consistent spacing between sections for visual clarity:
+- All sections (FilterPanel, TemplateLibrary, DirectoryScanner, Analytics) have `border-t` for separation
+- Sections use `mt-4` for vertical breathing room
+- Each section has `p-4` for internal padding
+- This creates a comfortable, scannable layout
 
 ## Related Components
 
