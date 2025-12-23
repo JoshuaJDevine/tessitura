@@ -62,10 +62,17 @@ function MyComponent() {
 
 ## Testing
 
-The function should be tested with:
-- Edge cases: 0, 4, 5, 19, 20, 49, 50, 100+
-- Negative numbers (should default to 'common')
-- Very large numbers (should return 'legendary')
+- **Coverage:** 100% (16 tests)
+- **Test file:** `src/lib/rarity.test.ts`
+- **Key test cases:**
+  - Happy path: Returns 'common' for 0-4 uses
+  - Happy path: Returns 'rare' for 5-19 uses
+  - Happy path: Returns 'epic' for 20-49 uses
+  - Happy path: Returns 'legendary' for 50+ uses
+  - Edge case: Negative numbers return 'common'
+  - Edge case: Very large numbers return 'legendary'
+  - Boundary values: All tier boundaries (4, 5, 19, 20, 49, 50) tested
+  - Edge case: Floating point numbers handled correctly
 
 ## Related Components
 

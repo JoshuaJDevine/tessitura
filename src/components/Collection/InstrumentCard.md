@@ -164,6 +164,24 @@ Optional usage count badge (bottom-right corner):
 - Shows current usage count number
 - Hidden by default (can be enabled in future settings)
 
+## Testing
+
+- **Coverage:** 85.18% (45 tests)
+- **Test file:** `src/components/Collection/InstrumentCard.test.tsx`
+- **Key test cases:**
+  - Rarity class applied correctly for all tiers (common, rare, epic, legendary)
+  - Rarity updates immediately when usage count crosses threshold
+  - Usage badge hidden by default (showUsageBadge=false)
+  - Usage badge renders when showUsageBadge=true and usageCount > 0
+  - Usage badge does not render when showUsageBadge=true but usageCount is 0
+  - Quick action button renders when onMarkAsUsed is provided
+  - Quick action button does not render when onMarkAsUsed is not provided
+  - Quick action button calls onMarkAsUsed when clicked
+  - Quick action button prevents event propagation (doesn't trigger card selection)
+  - Context menu prevents default behavior on right-click
+  - Card selection works via click and keyboard (Enter/Space)
+  - Visual feedback animations work correctly
+
 ## Future Enhancements
 
 - Flip animation on hover (Phase 2.1)

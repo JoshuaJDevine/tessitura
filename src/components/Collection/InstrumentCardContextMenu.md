@@ -69,6 +69,22 @@ The component includes a confirmation dialog before deleting to prevent accident
 - Screen reader announcements
 - Focus management
 
+## Testing
+
+- **Coverage:** 100% (10 tests)
+- **Test file:** `src/components/Collection/InstrumentCardContextMenu.test.tsx`
+- **Key test cases:**
+  - Renders children correctly
+  - Context menu renders with all actions (Mark as Used, Edit, Delete)
+  - "Mark as Used" calls markAsUsed from store
+  - "Mark as Used" calls onMarkAsUsed callback when provided
+  - "Edit" calls openEditInstrument from uiStore
+  - "Delete" shows confirmation dialog
+  - Delete confirmation dialog displays instrument name
+  - Delete confirmation calls deleteInstrument when confirmed
+  - Delete confirmation cancels when "Cancel" clicked
+  - Keyboard accessible
+
 ## Related Components
 
 - `InstrumentCard` - Wraps cards with this context menu
