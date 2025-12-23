@@ -103,47 +103,27 @@
 
 ---
 
-## ✅ Phase 5: Review & Push
+## ✅ Phase 5: Review, Push & Merge
 
-### Pre-Push Checklist
+### Pre-Push Checklist (Completed by @docs Agent)
 - [ ] All architecture decisions documented
 - [ ] All code implemented per plan
 - [ ] All tests written and passing
 - [ ] All documentation updated
-- [ ] Pre-commit hooks pass
-- [ ] Test coverage meets standards
-- [ ] Manual testing complete
+- [ ] Code formatted with Prettier
+- [ ] All CI checks pass locally
+- [ ] Branch pushed to GitHub
 
-### Pre-Push Commands (Run These Before Pushing!)
+### @docs Agent Responsibilities
 
 **1. Format All Code**
 ```bash
 npm run format
 ```
 
-**2. Run All CI Checks Locally**
-
-**Option A: Automated (Recommended)**
+**2. Run All CI Checks**
 ```bash
 npm run pre-push
-```
-
-**Option B: Manual**
-```bash
-# Documentation validation
-npm run docs:validate
-
-# TypeScript type check
-npm run type-check
-
-# Linting
-npm run lint
-
-# Format check (should pass after step 1)
-npm run format:check
-
-# Run tests
-npm test -- --run
 ```
 
 **3. Commit Formatting Changes (if any)**
@@ -152,24 +132,48 @@ git add -A
 git commit -m "style: format code with Prettier"
 ```
 
-### Push to GitHub
-**IMPORTANT: Never merge to main locally. Always push branch and create PR on GitHub.**
-
+**4. Push to GitHub**
 ```bash
-# Push feature branch to GitHub
 git push -u origin [branch-name]
-
-# GitHub will provide a PR URL, e.g.:
-# https://github.com/username/repo/pull/new/[branch-name]
 ```
 
-### Create Pull Request
-1. Visit the PR URL provided by GitHub
-2. Fill in PR description with feature summary
-3. Link to any related issues
-4. Request reviews if needed
-5. Wait for CI/CD to pass
-6. Merge through GitHub's interface (NOT locally)
+**5. Instruct Engineer**
+Provide engineer with:
+- GitHub branch URL
+- Instructions to create PR
+- Reminder to run `npm run feature:complete` after merge
+
+### Engineer Responsibilities
+
+**After @docs pushes to GitHub:**
+
+1. **Create Pull Request**
+   - Visit: https://github.com/username/repo/pull/new/[branch-name]
+   - Fill in PR description with feature summary
+   - Link to any related issues
+   - Request reviews if needed
+
+2. **Wait for CI/CD to Pass**
+   - Verify all GitHub Actions checks pass
+   - Address any failures
+
+3. **Merge via GitHub**
+   - Use GitHub's merge button (NOT local merge)
+   - Choose merge strategy (squash/merge/rebase per team policy)
+
+4. **Run Cleanup**
+   ```bash
+   npm run feature:complete
+   ```
+   - Archives the feature file
+   - Provides cleanup instructions
+
+5. **Clean Up Local Branches**
+   ```bash
+   git checkout main
+   git pull origin main
+   git branch -d feature/[branch-name]
+   ```
 
 ---
 

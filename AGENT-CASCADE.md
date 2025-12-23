@@ -268,47 +268,18 @@ New features:
 **Next Step:** Review & Push
 ```
 
-### Step 7: Review & Push
+### Step 7: @docs Agent Final Steps
 
-**Check the feature file's review checklist:**
-
-```markdown
-## ✅ Phase 5: Review & Push
-
-### Pre-Push Checklist
-- [x] All architecture decisions documented
-- [x] All code implemented per plan
-- [x] All tests written and passing (94% coverage)
-- [x] All documentation updated
-- [x] Pre-commit hooks pass
-- [x] Manual testing complete
-```
-
-**Manual Testing:**
-1. Run `npm run dev`
-2. Test the zoom controls
-3. Test keyboard shortcuts
-4. Verify zoom level indicator
-
-**Complete the feature:**
-```bash
-npm run feature:complete
-```
-
-This will:
-- Archive the feature file to `.cursor/features/completed/`
-- Show you the pre-push checklist
-
-**Pre-Push Steps (CRITICAL - Do Not Skip!):**
+**The @docs agent completes all pre-push work:**
 
 ```bash
 # 1. Format all code
 npm run format
 
-# 2. Verify all CI checks pass locally (automated)
+# 2. Verify all CI checks pass locally
 npm run pre-push
 
-# 3. Commit any formatting changes
+# 3. Commit any formatting changes (if needed)
 git add -A
 git commit -m "style: format code with Prettier"
 
@@ -316,17 +287,51 @@ git commit -m "style: format code with Prettier"
 git push -u origin feature/canvas-zoom
 ```
 
-**Note:** The `npm run pre-push` command runs all checks (docs:validate, type-check, lint, format:check, test) and provides a summary.
+**@docs agent then tells the engineer:**
+```
+✅ Branch pushed to GitHub: https://github.com/username/repo/tree/feature/canvas-zoom
 
-**⚠️ IMPORTANT: Never merge to main locally**
+Next steps for engineer:
+1. Create PR: https://github.com/username/repo/pull/new/feature/canvas-zoom
+2. Wait for CI/CD to pass
+3. Merge via GitHub interface
+4. Run: npm run feature:complete
+```
 
-**Create PR on GitHub:**
-1. GitHub will show a PR URL in the push output
-2. Visit that URL
-3. Fill in PR description
-4. Request reviews
-5. Wait for CI/CD to pass (should match local results)
-6. **Merge through GitHub's interface** (not locally)
+**⚠️ Agent pushed to GitHub, did NOT merge to main locally**
+
+### Step 8: Engineer Creates PR & Merges
+
+**Engineer's responsibilities:**
+
+1. **Create Pull Request on GitHub**
+   - Visit the PR URL provided by @docs agent
+   - Fill in description summarizing the feature
+   - Link related issues
+   - Request reviews (if required)
+
+2. **Wait for CI/CD Validation**
+   - GitHub Actions will run same checks as local
+   - Should pass since `npm run pre-push` passed
+
+3. **Merge via GitHub Interface**
+   - Use GitHub's merge button
+   - Follow team's merge strategy (squash/merge/rebase)
+   - **NEVER** merge locally with `git merge`
+
+4. **Run Feature Complete**
+   ```bash
+   npm run feature:complete
+   ```
+   
+   This archives the feature file and provides cleanup instructions:
+   ```bash
+   git checkout main
+   git pull origin main
+   git branch -d feature/canvas-zoom
+   ```
+
+**Feature is now complete! 🎉**
 
 ## 🎨 Why This Works
 

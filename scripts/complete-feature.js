@@ -3,7 +3,11 @@
 /**
  * Complete Feature Script
  * 
- * Archives a completed feature lifecycle file and provides push instructions.
+ * Archives a completed feature file from active to completed.
+ * Run this AFTER the feature branch has been pushed to GitHub,
+ * PR has been created, CI has passed, and merged via GitHub.
+ * 
+ * This is a cleanup step, not a pre-push step.
  */
 
 import { readdirSync, renameSync, existsSync, mkdirSync } from 'fs';
@@ -67,31 +71,17 @@ async function main() {
   renameSync(sourcePath, destPath);
 
   console.log(`\n✅ Feature archived: .cursor/features/completed/${featureFile}`);
-  console.log('\n📋 Pre-Push Checklist:');
-  console.log('\n1. Format code:');
-  console.log('   npm run format');
-  console.log('\n2. Run all checks (automated):');
-  console.log('   npm run pre-push');
-  console.log('   ');
-  console.log('   Or manually:');
-  console.log('   npm run docs:validate');
-  console.log('   npm run type-check');
-  console.log('   npm run lint');
-  console.log('   npm run format:check');
-  console.log('   npm test -- --run');
-  console.log('\n3. Commit any formatting changes:');
-  console.log('   git add -A');
-  console.log('   git commit -m "style: format code with Prettier"');
-  console.log('\n4. Push branch to GitHub:');
-  console.log(`   git push -u origin feature/${featureName}`);
-  console.log('\n5. Create Pull Request:');
-  console.log('   GitHub will provide a PR URL in the output');
-  console.log('   Visit that URL to create the PR');
-  console.log('\n6. Review and Merge:');
-  console.log('   - Wait for CI/CD checks to pass');
-  console.log('   - Request reviews if needed');
-  console.log('   - Merge through GitHub interface');
-  console.log('\n⚠️  NEVER merge to main locally - always use GitHub PRs\n');
+  console.log('\n📋 Post-Merge Cleanup:');
+  console.log('\nThe feature has been merged! Now clean up:');
+  console.log('\n1. Switch back to main:');
+  console.log('   git checkout main');
+  console.log('\n2. Pull latest changes:');
+  console.log('   git pull origin main');
+  console.log('\n3. Delete local feature branch:');
+  console.log(`   git branch -d feature/${featureName}`);
+  console.log('\n4. (Optional) Delete remote branch:');
+  console.log(`   git push origin --delete feature/${featureName}`);
+  console.log('\n✨ Feature complete! Ready for next feature.\n');
 
   rl.close();
 }
