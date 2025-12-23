@@ -52,6 +52,32 @@
 **Issues Encountered:**
 [Any problems or deviations from plan]
 
+**Next Agent:** @test
+**Test Prompt:**
+```
+[Detailed prompt for @test with specific instructions]
+```
+
+---
+
+## 🧪 Phase 3: Testing
+
+### @test Response
+
+**Tests Created:**
+[List of test files created]
+
+**Test Coverage:**
+[Summary of what's covered]
+
+**Test Types:**
+- [ ] Unit tests for business logic
+- [ ] Integration tests for component interactions
+- [ ] E2E tests for critical user flows
+
+**Commits:**
+[List of commit messages]
+
 **Next Agent:** @docs
 **Docs Prompt:**
 ```
@@ -60,7 +86,7 @@
 
 ---
 
-## 📚 Phase 3: Documentation
+## 📚 Phase 4: Documentation
 
 ### @docs Response
 
@@ -77,13 +103,15 @@
 
 ---
 
-## ✅ Phase 4: Review & Push
+## ✅ Phase 5: Review & Push
 
 ### Pre-Push Checklist
 - [ ] All architecture decisions documented
 - [ ] All code implemented per plan
+- [ ] All tests written and passing
 - [ ] All documentation updated
 - [ ] Pre-commit hooks pass
+- [ ] Test coverage meets standards
 - [ ] Manual testing complete
 - [ ] Ready for git push
 - [ ] Ready to create PR

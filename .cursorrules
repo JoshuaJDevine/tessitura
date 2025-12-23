@@ -2,10 +2,14 @@
 
 ## Agent Roles
 
-This project uses multiple agent roles for different tasks:
+This project uses multiple agent roles in a cascade workflow:
+- **@architect** - Architecture decisions and implementation planning
 - **@coder** - Implementation and feature development
+- **@test** - Test coverage and quality assurance
 - **@docs** - Documentation updates and maintenance
-- **@architect** - Architecture decisions and design reviews
+
+See `AGENT-CASCADE.md` for the complete workflow guide.
+See `.cursorrules-test` for detailed @test agent instructions.
 
 ## Self-Documenting Architecture
 
@@ -314,32 +318,41 @@ Keep these in mind when making architectural decisions.
 
 ### Agent-Specific Instructions
 
+#### @architect Agent:
+When reviewing architecture:
+1. Analyze requirements thoroughly
+2. Make architecture decisions with rationale
+3. Create detailed implementation plan
+4. Check if decision warrants an ADR
+5. Generate specific @coder prompt
+6. Update architecture documentation
+7. Consider future migration paths
+
 #### @coder Agent:
 When implementing features:
-1. Read related .md files for context
-2. Follow TypeScript strict mode
-3. Add JSDoc comments
-4. Keep files under size limits
-5. Create .md file if new component
-6. Update existing .md if modifying component
+1. Follow the architecture plan exactly
+2. Read related .md files for context
+3. Follow TypeScript strict mode
+4. Add JSDoc comments
+5. Keep files under size limits
+6. Generate specific @test prompt with implementation details
+
+#### @test Agent:
+When writing tests:
+1. Analyze the implementation
+2. Write comprehensive test coverage (80%+ minimum)
+3. Follow testing best practices (see `.cursorrules-test`)
+4. Test behavior, not implementation
+5. Generate specific @docs prompt with testing details
 
 #### @docs Agent:
 When updating documentation:
-1. Read the code file first
-2. Update corresponding .md file
-3. Ensure examples are current
-4. Update "Last Updated" with date and reason
-5. Check if architecture docs need updates
+1. Read the code and test files
+2. Update corresponding .md files
+3. Document test coverage
+4. Ensure examples are current
+5. Update "Last Updated" with date and reason
 6. Verify all sections are complete
-
-#### @architect Agent:
-When reviewing architecture:
-1. Check if decision warrants an ADR
-2. Review for consistency with existing patterns
-3. Identify potential breaking changes
-4. Suggest refactoring opportunities
-5. Update architecture documentation
-6. Consider future migration paths
 
 ### Quick Reference
 

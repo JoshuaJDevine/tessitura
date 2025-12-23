@@ -1,142 +1,142 @@
-# Development Workflow Guide
+# Development Workflow
 
-This document explains the self-documenting workflow established for this project.
+This document provides an overview of the development workflow for the Music Plugin Organizer.
 
-## 🎯 Core Principle
+## 🎯 Core Workflow: Agent Cascade
 
-**Code and documentation are created together, never separately.**
+**This project uses an Agent Cascade pattern for all feature development.**
 
-Every component, hook, and store must have a corresponding `.md` file that documents its purpose, API, usage, and relationships.
+See **[AGENT-CASCADE.md](AGENT-CASCADE.md)** for the complete guide.
+
+### Quick Overview
+
+```
+npm run feature:start
+  ↓
+@architect (plan + generate @coder prompt)
+  ↓
+@coder (implement + generate @test prompt)
+  ↓  
+@test (test + generate @docs prompt)
+  ↓
+@docs (document)
+  ↓
+npm run feature:complete
+  ↓
+git push
+```
+
+## 📋 Quick Reference Commands
+
+### Feature Management
+```bash
+npm run feature:start      # Start new feature (creates branch + lifecycle file)
+npm run feature:complete   # Archive completed feature
+```
+
+### Development
+```bash
+npm run dev               # Start Vite dev server
+npm run electron:dev      # Start Electron app
+```
+
+### Quality Checks
+```bash
+npm run type-check        # TypeScript type check
+npm run lint              # ESLint
+npm run lint:fix          # Fix ESLint errors
+npm run format            # Format with Prettier
+npm run format:check      # Check formatting
+npm test                  # Run tests
+npm run test:coverage     # Test coverage report
+```
+
+### Documentation
+```bash
+npm run docs:validate     # Check all files have .md files
+```
+
+### Building
+```bash
+npm run build             # Build for production
+npm run electron:pack     # Package Electron app
+```
 
 ## 🤖 Agent Roles
 
-This project uses multiple agent roles in Cursor:
+### @architect
+- Reviews feature requirements
+- Makes architecture decisions
+- Creates implementation plan
+- Generates @coder prompt
 
-### @coder - Implementation Agent
-- Implements features and fixes bugs
-- Writes clean, modular code
-- Follows TypeScript strict mode
-- Adds JSDoc comments
-- Creates `.md` files for new modules
+### @coder
+- Implements features per architecture plan
+- Follows code quality standards
+- Commits implementation
+- Generates @test prompt
 
-### @docs - Documentation Agent
-- Updates documentation when code changes
-- Ensures examples are current
-- Maintains architecture docs
-- Updates "Last Updated" timestamps
+### @test
+- Writes comprehensive test coverage
+- Ensures 80%+ coverage
+- Tests behavior, not implementation
+- Generates @docs prompt
 
-### @architect - Architecture Agent
-- Reviews architectural changes
-- Creates/updates ADRs
-- Identifies breaking changes
-- Suggests refactoring opportunities
+### @docs
+- Updates all affected documentation
+- Documents test coverage
+- Updates usage examples
+- Updates timestamps
 
-## 📁 File Structure
-
-Every module follows this pattern:
+## 📁 File Organization
 
 ```
-src/components/MyComponent/
-├── MyComponent.tsx      # Implementation
-├── MyComponent.md       # Documentation
-└── MyComponent.test.tsx # Tests (future)
+src/
+├── components/
+│   ├── ComponentName/
+│   │   ├── ComponentName.tsx
+│   │   ├── ComponentName.md          # Required documentation
+│   │   └── ComponentName.test.tsx    # Required tests
+│   └── ...
+├── hooks/
+│   ├── useHookName.ts
+│   ├── useHookName.md                # Required documentation
+│   └── useHookName.test.ts           # Required tests
+└── store/
+    ├── storeName.ts
+    ├── storeName.md                  # Required documentation
+    └── storeName.test.ts             # Required tests
 ```
 
-## 📝 Documentation Template
+## 🎨 Code Quality Standards
 
-Every `.md` file must contain:
+### TypeScript
+- ✅ Strict mode enabled
+- ✅ Explicit return types
+- ✅ No `any` without justification
+- ✅ Interface for object shapes
 
-```markdown
-# ComponentName
+### React
+- ✅ Functional components only
+- ✅ Custom hooks for reusable logic
+- ✅ Proper dependency arrays
+- ✅ Memoization when needed
 
-**Last Updated:** YYYY-MM-DD - Reason for update
+### Testing
+- ✅ 80%+ coverage for new code
+- ✅ Test behavior, not implementation
+- ✅ Descriptive test names
+- ✅ Arrange-Act-Assert pattern
 
-## Purpose
-What it does and why it exists
+### Documentation
+- ✅ Every component/hook/store has .md file
+- ✅ JSDoc comments on exported functions
+- ✅ Usage examples in documentation
+- ✅ Updated timestamps
 
-## Dependencies
-- List of imports and their purposes
+## 🔄 Git Workflow
 
-## Props/API
-TypeScript interface with descriptions
-
-## Usage Example
-Code example showing how to use it
-
-## State Management
-What state it manages and how
-
-## Related Components
-What it connects to or works with
-
-## Future Enhancements
-- [ ] Planned improvements
-```
-
-See `.cursor/rules/documentation-rules.mdc` for the full template.
-
-## 🔄 Development Workflow
-
-### Starting a New Feature
-
-1. **Plan First**
-   ```
-   You: @architect I want to add [feature]. What's the best approach?
-   ```
-
-2. **Implement**
-   ```
-   You: @coder Implement [feature] following the plan
-   ```
-
-3. **Document**
-   ```
-   You: @docs Update documentation for the changes just made
-   ```
-
-4. **Commit**
-   ```bash
-   git add .
-   git commit -m "feat(scope): description"
-   ```
-
-### Modifying Existing Code
-
-1. **Read Context**
-   - Read the `.md` file for the module you're changing
-   - Understand dependencies and related components
-
-2. **Make Changes**
-   ```
-   You: @coder Update [component] to [do something]
-   ```
-
-3. **Update Docs**
-   ```
-   You: @docs Review and update [component].md based on changes
-   ```
-
-4. **Commit**
-   ```bash
-   git add .
-   git commit -m "fix(scope): description"
-   ```
-
-## 🛡️ Pre-Commit Checks
-
-Before every commit, these checks run automatically:
-
-1. **Documentation Validation** - Ensures all files have `.md` files
-2. **TypeScript Type Check** - Ensures no type errors
-3. **ESLint** - Ensures code quality
-4. **Prettier** - Ensures consistent formatting
-5. **Commit Message Format** - Ensures conventional commits
-
-If any check fails, the commit is blocked with helpful instructions.
-
-## 📋 Commit Message Format
-
-Use conventional commits:
+### Commit Message Format
 
 ```
 <type>(<scope>): <subject>
@@ -149,278 +149,127 @@ Use conventional commits:
 **Types:**
 - `feat` - New feature
 - `fix` - Bug fix
-- `docs` - Documentation only
-- `style` - Code style (formatting)
-- `refactor` - Code refactoring
 - `test` - Adding tests
-- `chore` - Build/tooling changes
+- `docs` - Documentation only
+- `refactor` - Code refactoring
+- `style` - Formatting
+- `chore` - Build/tooling
 
 **Examples:**
 ```bash
-feat(canvas): add zoom to fit selected nodes
+feat(canvas): add zoom controls with keyboard shortcuts
 fix(store): resolve instrument deletion bug
-docs(readme): update installation instructions
+test(canvas): add comprehensive zoom tests
+docs(canvas): update zoom controls documentation
 ```
 
-## 🔍 Finding Your Way Around
+### Pre-Commit Checks
 
-### Reading Documentation
+Every commit automatically runs:
+1. ✅ Documentation validation
+2. ✅ TypeScript type check
+3. ✅ ESLint (with auto-fix)
+4. ✅ Prettier formatting
+5. ✅ Commit message format validation
 
-1. **Start with README.md** - Project overview
-2. **Check docs/architecture/** - Architectural decisions
-3. **Read component .md files** - Specific implementations
+If any check fails, commit is blocked with helpful instructions.
 
-### Understanding a Component
+## 🚀 CI/CD Pipeline
 
-```bash
-# Read the documentation
-cat src/components/Canvas/Canvas.md
-
-# Read the implementation
-cat src/components/Canvas/Canvas.tsx
-
-# Find related components
-grep -r "Canvas" src/components/**/*.md
-```
-
-### Finding Where Something is Used
-
-```bash
-# Use grep to find imports
-npm run grep "useInstrumentStore"
-
-# Or use Cursor's search
-Ctrl+Shift+F
-```
-
-## 🚀 Common Tasks
-
-### Adding a New Component
-
-```typescript
-// 1. Create the component file
-src/components/NewComponent/NewComponent.tsx
-
-// 2. Implement the component
-export function NewComponent() {
-  // ...
-}
-
-// 3. Create documentation
-src/components/NewComponent/NewComponent.md
-
-// 4. Use the template from .cursor/rules/documentation-rules.mdc
-
-// 5. Commit
-git add src/components/NewComponent/
-git commit -m "feat(components): add NewComponent"
-```
-
-### Adding a New Store
-
-```typescript
-// 1. Create the store file
-src/store/newStore.ts
-
-// 2. Implement using Zustand pattern
-export const useNewStore = create<NewState>()(
-  persist(
-    (set, get) => ({
-      // state and actions
-    }),
-    {
-      name: 'new-storage',
-    }
-  )
-);
-
-// 3. Create documentation
-src/store/newStore.md
-
-// 4. Update docs/architecture/state-management.md
-
-// 5. Commit
-git add src/store/
-git commit -m "feat(store): add newStore for [purpose]"
-```
-
-### Making an Architectural Decision
-
-```typescript
-// 1. Discuss with architect agent
-You: @architect Should we use [option A] or [option B] for [problem]?
-
-// 2. Document the decision
-Add ADR to docs/architecture/decisions.md
-
-// 3. Implement the decision
-You: @coder Implement [chosen option]
-
-// 4. Commit
-git commit -m "feat(architecture): implement [decision]"
-```
-
-## 🧪 Testing Your Changes
-
-```bash
-# Validate documentation
-npm run docs:validate
-
-# Type check
-npm run type-check
-
-# Lint
-npm run lint
-
-# Format check
-npm run format:check
-
-# Run all checks
-npm run docs:validate && npm run type-check && npm run lint
-```
-
-## 🔧 Available Scripts
-
-```bash
-npm run dev                 # Start development server
-npm run electron:dev        # Start Electron app
-npm run build               # Build for production
-npm run type-check          # TypeScript type check
-npm run lint                # Run ESLint
-npm run lint:fix            # Fix ESLint errors
-npm run format              # Format code with Prettier
-npm run format:check        # Check formatting
-npm run docs:validate       # Validate documentation completeness
-npm run docs:prompt         # Generate documentation update prompts
-npm run docs:check          # Check if docs need updating (pre-commit)
-```
-
-## 🐛 Troubleshooting
-
-### Pre-commit hook fails with "Documentation missing"
-
-**Problem:** You modified a component but didn't update its `.md` file.
-
-**Solution:**
-1. Check `.cursor/doc-prompt.txt` for the generated prompt
-2. Paste into Cursor Chat: `@docs [prompt from file]`
-3. Review and commit the documentation updates
-4. Try committing again
-
-### Pre-commit hook fails with "Type errors"
-
-**Problem:** TypeScript compilation errors.
-
-**Solution:**
-```bash
-npm run type-check
-# Fix the errors shown
-git add .
-git commit -m "fix: resolve type errors"
-```
-
-### Pre-commit hook fails with "Lint errors"
-
-**Problem:** ESLint found code quality issues.
-
-**Solution:**
-```bash
-npm run lint:fix
-git add .
-git commit -m "style: fix linting errors"
-```
-
-### Commit message rejected
-
-**Problem:** Commit message doesn't follow conventional format.
-
-**Solution:**
-```bash
-# Use the correct format
-git commit -m "feat(scope): description"
-# Not: "added new feature"
-```
-
-## 📚 Learning Resources
-
-### Project Documentation
-- `README.md` - Getting started
-- `docs/architecture/decisions.md` - ADRs
-- `docs/architecture/data-model.md` - Data structures
-- `docs/architecture/state-management.md` - State patterns
-
-### Component Documentation
-- Browse `src/components/**/*.md`
-- Browse `src/store/**/*.md`
-- Browse `src/hooks/**/*.md`
-
-### Cursor Rules
-- `.cursorrules` - Main development rules
-- `.cursor/rules/documentation-rules.mdc` - Documentation template
-
-## 🎓 Best Practices
-
-### DO:
-✅ Read the `.md` file before modifying a component
-✅ Update documentation when you change code
-✅ Keep files under size limits (see `.cursorrules`)
-✅ Write descriptive commit messages
-✅ Ask the architect agent for big decisions
-✅ Use TypeScript strict mode
-✅ Add JSDoc comments to exported functions
-
-### DON'T:
-❌ Commit without documentation
-❌ Use `any` type without justification
-❌ Create files over size limits
-❌ Skip pre-commit checks
-❌ Make architectural changes without ADRs
-❌ Modify UI components (they're from shadcn/ui)
-
-## 🚦 CI/CD Pipeline
-
-### On Push/PR
-1. Documentation validation
-2. TypeScript type check
-3. ESLint
-4. Prettier format check
-5. Build test (all platforms)
-
-### On Tag (v*)
-1. Build for Windows, macOS, Linux
-2. Create GitHub release
-3. Upload artifacts
+### On Every Push/PR
+- Documentation validation
+- TypeScript type check
+- ESLint
+- Test suite
+- Build verification (all platforms)
 
 ### On Push to Main
-1. Deploy documentation to GitHub Pages
+- Deploy documentation to GitHub Pages
+- Generate coverage reports
 
-## 🤝 Contributing
+### On Version Tags (v*)
+- Build for Windows, macOS, Linux
+- Create GitHub Release
+- Upload artifacts
 
-1. Fork the repository
-2. Create a feature branch
-3. Follow this workflow guide
-4. Ensure all checks pass
-5. Submit a pull request
+## 📚 Key Documents
 
-## 📞 Getting Help
+- **[AGENT-CASCADE.md](AGENT-CASCADE.md)** - Complete cascade workflow guide
+- **[.cursorrules](.cursorrules)** - Agent behavior rules
+- **[.cursorrules-test](.cursorrules-test)** - @test agent rules
+- **[docs/architecture/](docs/architecture/)** - Architecture decisions
+- **[SETUP-COMPLETE.md](SETUP-COMPLETE.md)** - Setup summary
 
-- **Documentation issues:** Ask `@docs` agent
-- **Implementation questions:** Ask `@coder` agent
-- **Architecture decisions:** Ask `@architect` agent
-- **Workflow questions:** Read this file or `.cursorrules`
+## 💡 Best Practices
 
-## 🎯 Success Criteria
+### DO:
+✅ Start every feature with `npm run feature:start`
+✅ Follow the agent cascade (@architect → @coder → @test → @docs)
+✅ Write tests for all new code (80%+ coverage)
+✅ Update documentation with every change
+✅ Use descriptive commit messages
+✅ Review the feature file before pushing
+✅ Complete all phases before `npm run feature:complete`
 
-You're following the workflow correctly if:
+### DON'T:
+❌ Skip the architecture phase
+❌ Skip writing tests
+❌ Commit without documentation
+❌ Push without completing all phases
+❌ Modify UI components (they're from shadcn/ui)
+❌ Use `--no-verify` to skip checks (except rare cases)
 
-✅ Every component has a `.md` file
-✅ Documentation is up to date
-✅ Commits follow conventional format
-✅ Pre-commit checks pass
-✅ CI/CD pipeline is green
-✅ New developers can understand the code by reading docs
+## 🎯 Success Metrics
+
+Your workflow is working well when:
+- ✅ All features have 80%+ test coverage
+- ✅ All components have .md documentation
+- ✅ Pre-commit checks always pass
+- ✅ CI/CD pipeline is green
+- ✅ Feature files are complete and archived
+- ✅ Code follows consistent patterns
+
+## 🆘 Troubleshooting
+
+### Pre-commit Hook Fails
+```bash
+# Check what failed
+npm run docs:validate
+npm run type-check
+npm run lint
+npm test
+
+# Fix issues and try again
+git add .
+git commit -m "fix: resolve issues"
+```
+
+### Documentation Validation Fails
+- Ensure every `.ts`/`.tsx` file (except UI components) has a `.md` file
+- Use the template in `.cursor/rules/documentation-rules.mdc`
+
+### Tests Failing
+```bash
+# Run tests with watch mode
+npm test -- --watch
+
+# Check coverage
+npm run test:coverage
+```
+
+### Need to Skip Hooks (Rare)
+```bash
+git commit --no-verify -m "emergency fix"
+# But use very sparingly!
+```
+
+## 📖 Learning Resources
+
+- Read completed features in `.cursor/features/completed/`
+- Review architecture decisions in `docs/architecture/decisions.md`
+- Check component documentation in `src/components/**/*.md`
+- See testing patterns in `*.test.ts` files
 
 ---
 
-**Remember:** The goal is that in 6 months, any agent (or human) can understand any part of this codebase by reading the `.md` files and architecture docs.
-
+**Remember:** The cascade workflow ensures consistent quality, complete documentation, and comprehensive testing for every feature. Follow it, and your codebase will remain maintainable and well-documented.

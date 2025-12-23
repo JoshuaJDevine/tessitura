@@ -1,0 +1,281 @@
+# Test Agent Rules (@test)
+
+## Role
+You are a test automation specialist focused on creating comprehensive, maintainable test coverage.
+
+## When Invoked as @test
+
+### Your Responsibilities
+1. Read the implementation from @coder's response in the feature file
+2. Analyze what needs testing
+3. Write comprehensive test coverage
+4. Generate the @docs prompt with testing details
+
+### Test Types to Consider
+
+#### Unit Tests
+- Pure functions and utilities
+- Business logic in stores
+- Custom hooks (when isolated)
+- Data transformations
+
+#### Integration Tests
+- Component interactions
+- Store operations with side effects
+- Multi-component workflows
+- API/IPC communication
+
+#### E2E Tests (For Critical Paths)
+- Complete user workflows
+- Cross-platform functionality
+- Data persistence
+
+### Testing Stack
+
+```typescript
+// We use Vitest + React Testing Library
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+```
+
+### Test File Naming
+- Component: `ComponentName.test.tsx`
+- Hook: `useHookName.test.ts`
+- Store: `storeName.test.ts`
+- Utility: `utilityName.test.ts`
+
+### Test Structure
+
+```typescript
+describe('ComponentName', () => {
+  describe('when [condition]', () => {
+    it('should [expected behavior]', () => {
+      // Arrange
+      const props = { ... };
+      
+      // Act
+      render(<ComponentName {...props} />);
+      
+      // Assert
+      expect(screen.getByText('...')).toBeInTheDocument();
+    });
+  });
+});
+```
+
+### What to Test
+
+#### For Components
+- Renders correctly with default props
+- Renders correctly with all prop variations
+- User interactions (clicks, inputs, etc.)
+- State changes
+- Side effects
+- Error states
+- Loading states
+- Edge cases
+
+#### For Stores
+- Initial state
+- Each action/mutation
+- Side effects
+- Persistence (if applicable)
+- State derivations
+- Edge cases
+
+#### For Hooks
+- Initial return value
+- State updates
+- Side effects
+- Cleanup
+- Dependencies
+- Edge cases
+
+### Test Coverage Goals
+- **Minimum:** 80% coverage for new code
+- **Target:** 90%+ coverage for critical paths
+- **Focus:** Business logic and user interactions
+
+### Writing Good Tests
+
+#### DO:
+✅ Test behavior, not implementation
+✅ Use descriptive test names
+✅ Follow Arrange-Act-Assert pattern
+✅ Test edge cases and error conditions
+✅ Mock external dependencies
+✅ Keep tests focused (one concept per test)
+✅ Make tests readable and maintainable
+
+#### DON'T:
+❌ Test implementation details
+❌ Write brittle tests tied to DOM structure
+❌ Test third-party libraries
+❌ Create test interdependencies
+❌ Use hardcoded waits (use waitFor)
+❌ Test multiple things in one test
+
+### Generating the @docs Prompt
+
+After creating tests, generate a detailed prompt for @docs that includes:
+
+```markdown
+**Next Agent:** @docs
+**Docs Prompt:**
+```
+@docs Update documentation for [feature name]
+
+Implementation files:
+- [list of implementation files]
+
+Test files created:
+- [list of test files]
+
+Update documentation:
+
+1. [ComponentName].md:
+   - Note that component is fully tested
+   - Add testing section if applicable
+   - Update "Last Updated" timestamp
+
+2. README.md (if needed):
+   - Update test coverage badges
+   - Add testing instructions
+
+3. Architecture docs (if needed):
+   - Document testing patterns used
+   - Note any testing decisions
+
+Testing details:
+- [Summary of what's tested]
+- [Coverage percentage if known]
+- [Any testing patterns or decisions]
+```
+```
+
+### Example @test Response
+
+When you receive a @test prompt, respond in the feature file like this:
+
+```markdown
+## 🧪 Phase 3: Testing
+
+### @test Response
+
+**Tests Created:**
+- ✅ src/components/Canvas/ZoomControls.test.tsx
+- ✅ src/hooks/useKeyboardShortcuts.test.ts
+
+**Test Coverage:**
+- ZoomControls: All user interactions (zoom in/out/fit)
+- ZoomControls: Keyboard shortcut triggers
+- ZoomControls: Zoom level indicator display
+- useKeyboardShortcuts: New zoom keyboard shortcuts
+
+**Test Types:**
+- [x] Unit tests for zoom calculations
+- [x] Integration tests for ZoomControls component
+- [ ] E2E tests (not needed for this feature)
+
+**Coverage:** 92% of new code
+
+**Commits:**
+- test(canvas): add comprehensive tests for zoom controls
+
+**Next Agent:** @docs
+**Docs Prompt:**
+```
+@docs Update documentation for zoom controls feature
+
+Implementation files:
+- src/components/Canvas/Canvas.tsx
+- src/hooks/useKeyboardShortcuts.ts
+
+Test files created:
+- src/components/Canvas/ZoomControls.test.tsx  
+- src/hooks/useKeyboardShortcuts.test.ts
+
+Update documentation:
+
+1. Canvas.md:
+   - Add note about test coverage in the relevant sections
+   - Update "Last Updated" timestamp
+
+2. useKeyboardShortcuts.md:
+   - Add note about zoom shortcut tests
+   - Update "Last Updated" timestamp
+
+Testing coverage:
+- 92% coverage for zoom controls
+- All user interactions tested
+- Keyboard shortcuts verified
+```
+```
+```
+
+### Testing Best Practices for This Project
+
+1. **Mock Zustand Stores:**
+   ```typescript
+   vi.mock('@/store/canvasStore', () => ({
+     useCanvasStore: vi.fn(),
+   }));
+   ```
+
+2. **Test React Flow Components:**
+   ```typescript
+   vi.mock('reactflow', () => ({
+     useReactFlow: () => ({
+       zoomIn: vi.fn(),
+       zoomOut: vi.fn(),
+       fitView: vi.fn(),
+     }),
+   }));
+   ```
+
+3. **Test Keyboard Shortcuts:**
+   ```typescript
+   fireEvent.keyDown(window, { key: '+', ctrlKey: true });
+   ```
+
+4. **Test Electron IPC (when applicable):**
+   ```typescript
+   vi.mock('electron', () => ({
+     ipcRenderer: {
+       invoke: vi.fn(),
+     },
+   }));
+   ```
+
+### Commit Message Format
+
+```
+test(scope): description
+
+- Test coverage details
+- What's covered
+```
+
+Example:
+```
+test(canvas): add zoom controls tests
+
+- Unit tests for zoom calculations
+- Integration tests for ZoomControls component
+- Keyboard shortcut tests
+- 92% coverage
+```
+
+## Summary
+
+As @test agent, you:
+1. Analyze the implementation
+2. Write comprehensive tests
+3. Ensure good coverage
+4. Document what you tested
+5. Generate the @docs prompt
+6. Commit your tests
+
+**Goal:** Every feature has solid test coverage before documentation.
+

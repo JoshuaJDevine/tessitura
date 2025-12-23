@@ -5,13 +5,13 @@ This guide explains the **agent cascade pattern** - a structured workflow where 
 ## 🎯 The Pattern
 
 ```
-Engineer → @architect → @coder → @docs → Push
-           ↓            ↓         ↓
-        Creates plan  Implements Updates docs
-        + next prompt + next prompt
+Engineer → @architect → @coder → @test → @docs → Push
+           ↓            ↓         ↓        ↓
+        Creates plan  Implements Tests    Updates docs
+        + next prompt + next prompt + next prompt
 ```
 
-**Key Principle:** Each agent generates the detailed prompt for the next agent, creating a guided cascade with preserved context.
+**Key Principle:** Each agent generates the detailed prompt for the next agent, creating a guided cascade with preserved context and comprehensive quality assurance.
 
 ## 🚀 Complete Walkthrough
 
@@ -108,7 +108,7 @@ Files: src/components/Canvas/Canvas.tsx, src/hooks/useKeyboardShortcuts.ts
 **@coder will:**
 1. Implement according to the architecture plan
 2. Make the commits
-3. Generate a detailed prompt for @docs
+3. Generate a detailed prompt for @test
 4. Update the feature file
 
 **Example @coder Output:**
@@ -128,14 +128,87 @@ Files: src/components/Canvas/Canvas.tsx, src/hooks/useKeyboardShortcuts.ts
 **Commits:**
 - feat(canvas): add zoom controls with keyboard shortcuts
 
+**Next Agent:** @test
+**Test Prompt:**
+```
+@test Write comprehensive tests for zoom controls feature
+
+Implementation files:
+- src/components/Canvas/Canvas.tsx (ZoomControls component)
+- src/hooks/useKeyboardShortcuts.ts (zoom shortcuts)
+
+What to test:
+
+1. ZoomControls component:
+   - Renders all three buttons (in/out/fit)
+   - Zoom in button calls zoomIn()
+   - Zoom out button calls zoomOut()
+   - Fit button calls fitView()
+   - Zoom level indicator displays correctly
+   - All buttons have proper accessibility labels
+
+2. useKeyboardShortcuts hook:
+   - Ctrl+Plus triggers zoom in
+   - Ctrl+Minus triggers zoom out
+   - Ctrl+0 triggers fit view
+   - Shortcuts work cross-platform (Cmd on Mac)
+
+Create test files:
+- src/components/Canvas/ZoomControls.test.tsx
+- src/hooks/useKeyboardShortcuts.test.ts (add to existing if present)
+
+Target coverage: 90%+ for new code
+Mock React Flow's useReactFlow hook
+```
+```
+
+### Step 5: Testing Phase
+
+**Copy the @test prompt from the feature file** and paste it into Cursor Chat.
+
+**@test will:**
+1. Write comprehensive test coverage
+2. Ensure tests pass
+3. Make the commits
+4. Generate a detailed prompt for @docs
+5. Update the feature file
+
+**Example @test Output:**
+```markdown
+## 🧪 Phase 3: Testing (COMPLETED)
+
+**Tests Created:**
+- ✅ src/components/Canvas/ZoomControls.test.tsx (8 tests)
+- ✅ src/hooks/useKeyboardShortcuts.test.ts (3 new tests)
+
+**Test Coverage:**
+- ZoomControls: All user interactions tested
+- ZoomControls: Accessibility labels verified
+- useKeyboardShortcuts: All zoom shortcuts tested
+- Edge cases: Disabled states, null refs, etc.
+
+**Coverage:** 94% of new code
+
+**Test Types:**
+- [x] Unit tests for zoom calculations
+- [x] Integration tests for ZoomControls component  
+- [ ] E2E tests (not needed for this feature)
+
+**Commits:**
+- test(canvas): add comprehensive zoom controls tests
+
 **Next Agent:** @docs
 **Docs Prompt:**
 ```
 @docs Update documentation for the zoom controls feature:
 
-Files modified:
+Implementation files:
 - src/components/Canvas/Canvas.tsx
 - src/hooks/useKeyboardShortcuts.ts
+
+Test files:
+- src/components/Canvas/ZoomControls.test.tsx (94% coverage)
+- src/hooks/useKeyboardShortcuts.test.ts
 
 Tasks:
 
@@ -143,6 +216,7 @@ Tasks:
    - Add "Zoom Controls" to Key Features section
    - Update usage example to include zoom controls
    - Document zoom keyboard shortcuts
+   - Add note about test coverage (94%)
    - Update "Last Updated" to today with reason: "Added zoom controls"
 
 2. useKeyboardShortcuts.md:
@@ -150,6 +224,7 @@ Tasks:
      - Ctrl+Plus: Zoom in
      - Ctrl+Minus: Zoom out
      - Ctrl+0: Fit view to all nodes
+   - Add note about comprehensive test coverage
    - Update "Last Updated" to today with reason: "Added zoom shortcuts"
 
 New features:
@@ -157,23 +232,25 @@ New features:
 - Visual zoom level indicator showing percentage
 - Keyboard shortcuts for zoom operations
 - Positioned in top-right corner of canvas
+- Comprehensive test coverage (94%)
 ```
 ```
 
-### Step 5: Documentation Phase
+### Step 6: Documentation Phase
 
 **Copy the @docs prompt from the feature file** and paste it into Cursor Chat.
 
 **@docs will:**
 1. Update all affected .md files
-2. Update examples and usage
-3. Update timestamps
-4. Make the commits
-5. Update the feature file
+2. Document test coverage
+3. Update examples and usage
+4. Update timestamps
+5. Make the commits
+6. Update the feature file
 
 **Example @docs Output:**
 ```markdown
-## 📚 Phase 3: Documentation (COMPLETED)
+## 📚 Phase 4: Documentation (COMPLETED)
 
 **Documentation Updated:**
 - ✅ Canvas.md - Added zoom controls documentation
@@ -191,16 +268,17 @@ New features:
 **Next Step:** Review & Push
 ```
 
-### Step 6: Review & Push
+### Step 7: Review & Push
 
 **Check the feature file's review checklist:**
 
 ```markdown
-## ✅ Phase 4: Review & Push
+## ✅ Phase 5: Review & Push
 
 ### Pre-Push Checklist
 - [x] All architecture decisions documented
 - [x] All code implemented per plan
+- [x] All tests written and passing (94% coverage)
 - [x] All documentation updated
 - [x] Pre-commit hooks pass
 - [ ] Manual testing complete
@@ -240,10 +318,10 @@ Engineer: "Add zoom controls"
     ↓ (thinking... what's the plan?)
 @coder: "Okay, I'll add some buttons"
     ↓ (inconsistent implementation)
-Engineer: "Wait, wrong approach..."
-    ↓ (lost context)
+Engineer: "Should I write tests?"
+    ↓ (tests forgotten)
 @docs: "What did you change?"
-    ↓ (incomplete docs)
+    ↓ (incomplete docs, no tests)
 ```
 
 **✅ New Way (Cascade):**
@@ -252,9 +330,11 @@ Engineer: "Add zoom controls"
     ↓
 @architect: "Here's the architectural plan + detailed @coder prompt"
     ↓ (consistent approach)
-@coder: "Implemented exactly per plan + detailed @docs prompt"
+@coder: "Implemented exactly per plan + detailed @test prompt"
     ↓ (full context)
-@docs: "Updated all docs per prompt"
+@test: "94% test coverage achieved + detailed @docs prompt"
+    ↓ (quality assured)
+@docs: "Updated all docs with test coverage info"
     ↓ (complete)
 ✅ Push
 ```
@@ -283,6 +363,12 @@ Create implementation plan and generate @coder prompt.
 [Copy from feature file's "Coder Prompt" section]
 ```
 
+### Quick Testing Prompt
+
+```
+[Copy from feature file's "Test Prompt" section]
+```
+
 ### Quick Documentation Prompt
 
 ```
@@ -307,10 +393,10 @@ Directly to @coder:
 For complex features, you might cycle through agents multiple times:
 
 ```
-@architect → @coder → Testing → Issues Found
+@architect → @coder → @test → Issues Found
     ↑______________|
     
-@architect (revise plan) → @coder (fix) → @docs → Push
+@architect (revise plan) → @coder (fix) → @test → @docs → Push
 ```
 
 ## 💡 Pro Tips
@@ -326,6 +412,7 @@ For complex features, you might cycle through agents multiple times:
 
 You know the system is working when:
 - ✅ Features follow consistent patterns
+- ✅ All features have 80%+ test coverage
 - ✅ Documentation is always up to date
 - ✅ No "how did we build this?" questions
 - ✅ New features reference similar past features

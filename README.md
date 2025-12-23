@@ -99,17 +99,43 @@ This project follows a self-documenting architecture:
 - **Architecture docs**: See `docs/architecture/` for ADRs and design decisions
 - **Store docs**: Each store has documentation in `src/store/*.md`
 
-## Architecture Decisions
+## Development Workflow
 
-See [docs/architecture/decisions.md](docs/architecture/decisions.md) for major architectural decisions.
+This project uses an **Agent Cascade Workflow** for feature development:
 
-## Data Model
+```
+@architect → @coder → @test → @docs
+```
 
-See [docs/architecture/data-model.md](docs/architecture/data-model.md) for data structure details.
+Each agent generates the prompt for the next, ensuring consistent quality and complete documentation.
 
-## State Management
+**Start a new feature:**
+```bash
+npm run feature:start
+```
 
-See [docs/architecture/state-management.md](docs/architecture/state-management.md) for state management patterns.
+**See [AGENT-CASCADE.md](AGENT-CASCADE.md) for complete workflow guide.**
+
+## Testing
+
+- **Framework:** Vitest + React Testing Library
+- **Coverage Goal:** 80%+ for new code, 90%+ for critical paths
+- **Run tests:** `npm test`
+- **Coverage:** `npm run test:coverage`
+
+## Architecture
+
+- **Decisions:** [docs/architecture/decisions.md](docs/architecture/decisions.md)
+- **Data Model:** [docs/architecture/data-model.md](docs/architecture/data-model.md)
+- **State Management:** [docs/architecture/state-management.md](docs/architecture/state-management.md)
+
+## Contributing
+
+1. Run `npm run feature:start` to begin
+2. Follow the agent cascade workflow
+3. Ensure all tests pass and coverage meets standards
+4. Complete all documentation
+5. Run `npm run feature:complete` when done
 
 ## License
 
