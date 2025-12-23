@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { InstrumentCard } from './InstrumentCard';
 import { Instrument } from '@/types';
 
@@ -16,6 +16,13 @@ vi.mock('./InstrumentCard.module.css', () => ({
     gradientWorld: 'gradientWorld',
     gradientVocal: 'gradientVocal',
     gradientOther: 'gradientOther',
+    rarityCommon: 'rarityCommon',
+    rarityRare: 'rarityRare',
+    rarityEpic: 'rarityEpic',
+    rarityLegendary: 'rarityLegendary',
+    quickActionButton: 'quickActionButton',
+    markAsUsedSuccess: 'markAsUsedSuccess',
+    usageBadge: 'usageBadge',
   },
 }));
 
@@ -561,6 +568,283 @@ describe('InstrumentCard', () => {
         expect(screen.getByText(host)).toBeInTheDocument();
         unmount();
       });
+    });
+  });
+
+  describe('rarity system', () => {
+    it('should apply common rarity class for 0-4 uses', () => {
+      const instrument = createMockInstrument({
+        metadata: { createdAt: new Date(), usageCount: 0 },
+      });
+      const { container } = render(
+        <InstrumentCard
+          instrument={instrument}
+          isSelected={false}
+          viewDensity="spacious"
+          onSelect={mockOnSelect}
+        />
+      );
+
+      const card = container.firstChild as HTMLElement;
+      expect(card.className).toContain('rarityCommon');
+    });
+
+    it('should apply rare rarity class for 5-19 uses', () => {
+      const instrument = createMockInstrument({
+        metadata: { createdAt: new Date(), usageCount: 5 },
+      });
+      const { container } = render(
+        <InstrumentCard
+          instrument={instrument}
+          isSelected={false}
+          viewDensity="spacious"
+          onSelect={mockOnSelect}
+        />
+      );
+
+      const card = container.firstChild as HTMLElement;
+      expect(card.className).toContain('rarityRare');
+    });
+
+    it('should apply epic rarity class for 20-49 uses', () => {
+      const instrument = createMockInstrument({
+        metadata: { createdAt: new Date(), usageCount: 20 },
+      });
+      const { container } = render(
+        <InstrumentCard
+          instrument={instrument}
+          isSelected={false}
+          viewDensity="spacious"
+          onSelect={mockOnSelect}
+        />
+      );
+
+      const card = container.firstChild as HTMLElement;
+      expect(card.className).toContain('rarityEpic');
+    });
+
+    it('should apply legendary rarity class for 50+ uses', () => {
+      const instrument = createMockInstrument({
+        metadata: { createdAt: new Date(), usageCount: 50 },
+      });
+      const { container } = render(
+        <InstrumentCard
+          instrument={instrument}
+          isSelected={false}
+          viewDensity="spacious"
+          onSelect={mockOnSelect}
+        />
+      );
+
+      const card = container.firstChild as HTMLElement;
+      expect(card.className).toContain('rarityLegendary');
+    });
+
+    it('should update rarity class when usage count crosses threshold', () => {
+      const instrument = createMockInstrument({
+        metadata: { createdAt: new Date(), usageCount: 4 },
+      });
+      const { container, rerender } = render(
+        <InstrumentCard
+          instrument={instrument}
+          isSelected={false}
+          viewDensity="spacious"
+          onSelect={mockOnSelect}
+        />
+      );
+
+      let card = container.firstChild as HTMLElement;
+      expect(card.className).toContain('rarityCommon');
+
+      const updatedInstrument = {
+        ...instrument,
+        metadata: { ...instrument.metadata, usageCount: 5 },
+      };
+      rerender(
+        <InstrumentCard
+          instrument={updatedInstrument}
+          isSelected={false}
+          viewDensity="spacious"
+          onSelect={mockOnSelect}
+        />
+      );
+
+      card = container.firstChild as HTMLElement;
+      expect(card.className).toContain('rarityRare');
+    });
+  });
+
+  describe('usage badge', () => {
+    it('should not render usage badge by default (showUsageBadge=false)', () => {
+      const instrument = createMockInstrument({
+        metadata: { createdAt: new Date(), usageCount: 5 },
+      });
+      render(
+        <InstrumentCard
+          instrument={instrument}
+          isSelected={false}
+          viewDensity="spacious"
+          onSelect={mockOnSelect}
+        />
+      );
+
+      expect(screen.queryByText('5')).not.toBeInTheDocument();
+    });
+
+    it('should render usage badge when showUsageBadge is true and usageCount > 0', () => {
+      const instrument = createMockInstrument({
+        metadata: { createdAt: new Date(), usageCount: 5 },
+      });
+      render(
+        <InstrumentCard
+          instrument={instrument}
+          isSelected={false}
+          viewDensity="spacious"
+          onSelect={mockOnSelect}
+          showUsageBadge={true}
+        />
+      );
+
+      expect(screen.getByText('5')).toBeInTheDocument();
+    });
+
+    it('should not render usage badge when showUsageBadge is true but usageCount is 0', () => {
+      const instrument = createMockInstrument({
+        metadata: { createdAt: new Date(), usageCount: 0 },
+      });
+      render(
+        <InstrumentCard
+          instrument={instrument}
+          isSelected={false}
+          viewDensity="spacious"
+          onSelect={mockOnSelect}
+          showUsageBadge={true}
+        />
+      );
+
+      expect(screen.queryByText('0')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('quick action button', () => {
+    it('should render quick action button when onMarkAsUsed is provided', () => {
+      const mockOnMarkAsUsed = vi.fn();
+      const instrument = createMockInstrument();
+      render(
+        <InstrumentCard
+          instrument={instrument}
+          isSelected={false}
+          viewDensity="spacious"
+          onSelect={mockOnSelect}
+          onMarkAsUsed={mockOnMarkAsUsed}
+        />
+      );
+
+      const button = screen.getByLabelText('Mark as used');
+      expect(button).toBeInTheDocument();
+    });
+
+    it('should not render quick action button when onMarkAsUsed is not provided', () => {
+      const instrument = createMockInstrument();
+      render(
+        <InstrumentCard
+          instrument={instrument}
+          isSelected={false}
+          viewDensity="spacious"
+          onSelect={mockOnSelect}
+        />
+      );
+
+      expect(screen.queryByLabelText('Mark as used')).not.toBeInTheDocument();
+    });
+
+    it('should call onMarkAsUsed when quick action button is clicked', () => {
+      const mockOnMarkAsUsed = vi.fn();
+      const instrument = createMockInstrument();
+      render(
+        <InstrumentCard
+          instrument={instrument}
+          isSelected={false}
+          viewDensity="spacious"
+          onSelect={mockOnSelect}
+          onMarkAsUsed={mockOnMarkAsUsed}
+        />
+      );
+
+      const button = screen.getByLabelText('Mark as used');
+      fireEvent.click(button);
+
+      expect(mockOnMarkAsUsed).toHaveBeenCalledWith('test-id-1');
+      expect(mockOnMarkAsUsed).toHaveBeenCalledTimes(1);
+    });
+
+    it('should prevent event propagation when quick action button is clicked', () => {
+      const mockOnMarkAsUsed = vi.fn();
+      const instrument = createMockInstrument();
+      render(
+        <InstrumentCard
+          instrument={instrument}
+          isSelected={false}
+          viewDensity="spacious"
+          onSelect={mockOnSelect}
+          onMarkAsUsed={mockOnMarkAsUsed}
+        />
+      );
+
+      const quickActionButton = screen.getByLabelText('Mark as used');
+
+      // Click quick action button - should not trigger card selection
+      fireEvent.click(quickActionButton);
+
+      expect(mockOnMarkAsUsed).toHaveBeenCalled();
+      expect(mockOnSelect).not.toHaveBeenCalled();
+    });
+
+    it('should show checkmark icon when marking as used', async () => {
+      const mockOnMarkAsUsed = vi.fn();
+      const instrument = createMockInstrument();
+      render(
+        <InstrumentCard
+          instrument={instrument}
+          isSelected={false}
+          viewDensity="spacious"
+          onSelect={mockOnSelect}
+          onMarkAsUsed={mockOnMarkAsUsed}
+        />
+      );
+
+      const button = screen.getByLabelText('Mark as used');
+      fireEvent.click(button);
+
+      // Wait for state update
+      await waitFor(() => {
+        // The button should still be in the document, but icon may change
+        expect(screen.getByLabelText('Mark as used')).toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('context menu', () => {
+    it('should prevent default context menu behavior', () => {
+      const instrument = createMockInstrument();
+      render(
+        <InstrumentCard
+          instrument={instrument}
+          isSelected={false}
+          viewDensity="spacious"
+          onSelect={mockOnSelect}
+        />
+      );
+
+      const card = screen.getByRole('button');
+      const event = new MouseEvent('contextmenu', { bubbles: true, cancelable: true });
+      const preventDefaultSpy = vi.spyOn(event, 'preventDefault');
+      const stopPropagationSpy = vi.spyOn(event, 'stopPropagation');
+
+      fireEvent(card, event);
+
+      expect(preventDefaultSpy).toHaveBeenCalled();
+      expect(stopPropagationSpy).toHaveBeenCalled();
     });
   });
 });

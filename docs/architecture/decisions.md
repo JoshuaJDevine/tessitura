@@ -416,6 +416,104 @@ Radically simplify Phase 1. Add features incrementally only after validating pre
 
 ---
 
+## ADR-014: Interactive Cards with Usage-Based Rarity
+
+**Date:** 2025-12-24  
+**Status:** Accepted
+
+### Context
+
+Phase 1 card collection is complete and validated. Cards are currently static - they display information but don't allow interaction or show usage-based visual feedback. Usage tracking infrastructure exists (`markAsUsed`, `usageCount`, `lastUsed`) but is not exposed in the UI.
+
+Users need:
+1. **Visual feedback** showing which instruments are frequently used vs. forgotten
+2. **Quick actions** to mark instruments as used directly from cards
+3. **Context menu** for common operations (edit, delete, mark as used)
+4. **Visual polish** that makes browsing more engaging
+
+This builds on ADR-012's rarity concept but adds the interaction layer needed to make it functional.
+
+### Decision
+
+Implement interactive cards with usage-based visual rarity system:
+
+**Visual Rarity Tiers:**
+- **Legendary** (50+ uses): Gold shimmer animation, gold border, subtle glow
+- **Epic** (20-49 uses): Purple glow effect, purple border accent
+- **Rare** (5-19 uses): Blue border highlight
+- **Common** (0-4 uses): Standard appearance (no special effects)
+
+**Card Interactions:**
+- Right-click context menu with: Mark as Used, Edit, Delete, View Details
+- Quick "Mark as Used" button on hover (subtle, doesn't clutter)
+- Visual feedback when marking as used (brief success animation)
+- Optional usage count badge (toggleable in settings)
+
+**Implementation Details:**
+- Rarity calculated in real-time from `instrument.metadata.usageCount`
+- Visual effects using CSS animations/transitions (no heavy libraries)
+- Context menu using shadcn/ui DropdownMenu component
+- Usage count badge is optional (hidden by default, can be enabled)
+
+### Rationale
+
+1. **Builds on Existing Infrastructure**: Usage tracking already exists, just needs UI exposure
+2. **Immediate Visual Value**: Makes collection browsing more engaging and informative
+3. **Self-Organizing**: System improves over time as users interact with instruments
+4. **Enables Future Features**: Foundation for "Surprise Me" discovery and deck recommendations
+5. **Focused Scope**: Cards-only feature, doesn't require broader refactoring
+6. **Gamification Psychology**: Visual rarity provides positive feedback, encourages exploration
+
+### Consequences
+
+- **Positive:** 
+  - More engaging UI that provides immediate feedback
+  - Users can discover underutilized instruments at a glance
+  - Foundation for discovery features
+  - Makes browsing feel more like a collection game
+  
+- **Negative:** 
+  - Adds complexity to card rendering logic
+  - CSS animations need performance testing with large collections
+  - Context menu adds interaction complexity
+  
+- **Mitigation:**
+  - Keep animations lightweight (CSS transforms, not JavaScript)
+  - Use React.memo on InstrumentCard to prevent unnecessary re-renders
+  - Performance test with 500+ cards before optimizing
+  - Keep context menu simple (4-5 actions max)
+
+### Alternatives Considered
+
+1. **Separate Rarity Badge Only** (no interactions)
+   - Rejected: Doesn't solve the "how do I mark as used?" problem
+   
+2. **Modal Dialog for Marking as Used**
+   - Rejected: Too much friction, breaks browsing flow
+   
+3. **Sidebar Panel for Usage Stats**
+   - Rejected: Users already have Analytics panel, need card-level feedback
+   
+4. **Complex Animation Library (Framer Motion)**
+   - Rejected: Adds bundle size, CSS animations sufficient for Phase 2
+
+### Implementation Notes
+
+- Rarity calculation: Pure function `getRarityTier(usageCount: number) => 'common' | 'rare' | 'epic' | 'legendary'`
+- Visual effects: CSS classes applied based on rarity tier
+- Context menu: Positioned at cursor, keyboard accessible
+- Usage count badge: Small badge in corner, only visible if enabled in settings
+- Animation timing: 200-300ms transitions, subtle and non-distracting
+
+### Future Enhancements
+
+- Time-based decay (instruments unused for 6+ months get "dusty" effect)
+- Per-category rarity (separate tiers for different categories)
+- Achievement system ("Discover 10 rare instruments")
+- Usage streak tracking ("Used 5 days in a row")
+
+---
+
 ## Related Documentation
 
 - **Card Collection Guide**: `docs/architecture/card-collection.md` (comprehensive design guide)
@@ -426,14 +524,15 @@ Radically simplify Phase 1. Add features incrementally only after validating pre
 
 ## Status Summary
 
-**Phase 1 (Current - In Progress):**
-- **ADR-009**: Card-Based UI - Replacing canvas completely
-- **ADR-010**: Auto-Scanning - Critical for Phase 1
-- **ADR-013**: Phased Development - Guiding principle
+**Phase 1 (Complete):**
+- **ADR-009**: Card-Based UI - ✅ Complete
+- **ADR-010**: Auto-Scanning - ✅ Complete
+- **ADR-013**: Phased Development - ✅ Complete
 
-**Phase 2 (Deferred):**
-- **ADR-011**: Decks System - After card UI validated
-- **ADR-012**: Rarity System - After usage data collected
+**Phase 2 (Current - In Progress):**
+- **ADR-014**: Interactive Cards with Usage-Based Rarity - ✅ Accepted, implementing now
+- **ADR-011**: Decks System - Deferred to Phase 2.1
+- **ADR-012**: Rarity System - Superseded by ADR-014 (implementation)
 
 **Legacy (Being Removed in Phase 1):**
 - ADR-001: React Flow - Canvas components will be deleted
