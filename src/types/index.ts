@@ -1,6 +1,22 @@
-export type Host = 'Kontakt' | 'Standalone' | 'VST3' | 'AU' | 'Soundbox' | 'SINE' | 'Opus' | 'Other';
+export type Host =
+  | 'Kontakt'
+  | 'Standalone'
+  | 'VST3'
+  | 'AU'
+  | 'Soundbox'
+  | 'SINE'
+  | 'Opus'
+  | 'Other';
 
-export type Category = 'Orchestral' | 'Synth' | 'Drums' | 'Effects' | 'Keys' | 'World' | 'Vocal' | 'Other';
+export type Category =
+  | 'Orchestral'
+  | 'Synth'
+  | 'Drums'
+  | 'Effects'
+  | 'Keys'
+  | 'World'
+  | 'Vocal'
+  | 'Other';
 
 export interface Instrument {
   id: string;
@@ -39,4 +55,3 @@ export interface Template {
   pairings: Array<{ from: string; to: string; note?: string }>;
   layout: Record<string, { x: number; y: number }>;
 }
-

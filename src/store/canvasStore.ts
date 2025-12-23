@@ -1,5 +1,14 @@
 import { create } from 'zustand';
-import { Node, Edge, Connection, addEdge, applyNodeChanges, applyEdgeChanges, NodeChange, EdgeChange } from 'reactflow';
+import {
+  Node,
+  Edge,
+  Connection,
+  addEdge,
+  applyNodeChanges,
+  applyEdgeChanges,
+  NodeChange,
+  EdgeChange,
+} from 'reactflow';
 import { Instrument, InstrumentGroup } from '@/types';
 
 interface CanvasStore {
@@ -45,9 +54,7 @@ export const useCanvasStore = create<CanvasStore>((set, get) => ({
 
   updateNodePosition: (id, position) => {
     set({
-      nodes: get().nodes.map((node) =>
-        node.id === id ? { ...node, position } : node
-      ),
+      nodes: get().nodes.map((node) => (node.id === id ? { ...node, position } : node)),
     });
   },
 
@@ -107,4 +114,3 @@ export const useCanvasStore = create<CanvasStore>((set, get) => ({
     return connected;
   },
 }));
-

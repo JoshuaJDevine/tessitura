@@ -31,9 +31,7 @@ export const useGroupStore = create<GroupStore>()(
 
       updateGroup: (id, updates) => {
         set((state) => ({
-          groups: state.groups.map((group) =>
-            group.id === id ? { ...group, ...updates } : group
-          ),
+          groups: state.groups.map((group) => (group.id === id ? { ...group, ...updates } : group)),
         }));
       },
 
@@ -81,4 +79,3 @@ export const useGroupStore = create<GroupStore>()(
     }
   )
 );
-

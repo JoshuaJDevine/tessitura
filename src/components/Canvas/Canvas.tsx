@@ -1,11 +1,5 @@
 import { useEffect, useCallback, useMemo } from 'react';
-import ReactFlow, {
-  Background,
-  Controls,
-  MiniMap,
-  NodeTypes,
-  ReactFlowProvider,
-} from 'reactflow';
+import ReactFlow, { Background, Controls, MiniMap, NodeTypes, ReactFlowProvider } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { InstrumentNode } from './InstrumentNode';
 import { GroupNode } from './GroupNode';
@@ -31,10 +25,11 @@ function CanvasInner() {
     getConnectedNodeIds,
     setSelectedNodeIds,
   } = useCanvasStore();
-  
+
   const { instruments } = useInstrumentStore();
   const { groups } = useGroupStore();
-  const { searchQuery, selectedTags, selectedCategories, selectedHosts, suggestedInstrumentId } = useUIStore();
+  const { searchQuery, selectedTags, selectedCategories, selectedHosts, suggestedInstrumentId } =
+    useUIStore();
   const { syncWithGroups } = useCanvasStore();
 
   // Sync canvas with instruments
@@ -57,18 +52,14 @@ function CanvasInner() {
       instrument.category.toLowerCase().includes(searchQuery.toLowerCase());
 
     const matchesTags =
-      selectedTags.length === 0 ||
-      selectedTags.some((tag) => instrument.tags.includes(tag));
+      selectedTags.length === 0 || selectedTags.some((tag) => instrument.tags.includes(tag));
 
     const matchesCategory =
-      selectedCategories.length === 0 ||
-      selectedCategories.includes(instrument.category);
+      selectedCategories.length === 0 || selectedCategories.includes(instrument.category);
 
-    const matchesHost =
-      selectedHosts.length === 0 || selectedHosts.includes(instrument.host);
+    const matchesHost = selectedHosts.length === 0 || selectedHosts.includes(instrument.host);
 
-    const isVisible =
-      matchesSearch && matchesTags && matchesCategory && matchesHost;
+    const isVisible = matchesSearch && matchesTags && matchesCategory && matchesHost;
 
     const isHighlighted = suggestedInstrumentId === instrument.id;
     const connectedIds = getConnectedNodeIds(instrument.id);
@@ -86,15 +77,12 @@ function CanvasInner() {
   });
 
   // Update instrument position when node is dragged
-  const onNodeDragStop = useCallback(
-    (_event: React.MouseEvent, node: any) => {
-      const instrument = node.data.instrument as Instrument;
-      useInstrumentStore.getState().updateInstrument(instrument.id, {
-        position: node.position,
-      });
-    },
-    []
-  );
+  const onNodeDragStop = useCallback((_event: React.MouseEvent, node: any) => {
+    const instrument = node.data.instrument as Instrument;
+    useInstrumentStore.getState().updateInstrument(instrument.id, {
+      position: node.position,
+    });
+  }, []);
 
   // Handle node selection
   const onNodeClick = useCallback(
@@ -108,19 +96,20 @@ function CanvasInner() {
 
   // Highlight connected nodes
   const highlightedEdges = useMemo(() => {
-    const selectedIds = new Set(
-      nodes.filter((n) => n.selected).map((n) => n.id)
-    );
-    
+    const selectedIds = new Set(nodes.filter((n) => n.selected).map((n) => n.id));
+
     return edges.map((edge) => {
       const sourceSelected = selectedIds.has(edge.source);
       const targetSelected = selectedIds.has(edge.target);
-      
+
       return {
         ...edge,
         style: {
           ...edge.style,
-          stroke: sourceSelected || targetSelected ? 'hsl(var(--primary))' : 'hsl(var(--muted-foreground))',
+          stroke:
+            sourceSelected || targetSelected
+              ? 'hsl(var(--primary))'
+              : 'hsl(var(--muted-foreground))',
           strokeWidth: sourceSelected || targetSelected ? 3 : 2,
         },
       };
@@ -162,4 +151,3 @@ export function Canvas() {
     </ReactFlowProvider>
   );
 }
-

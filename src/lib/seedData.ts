@@ -102,4 +102,3 @@ export const seedInstruments: Omit<Instrument, 'id' | 'position' | 'metadata'>[]
     color: '#ef4444',
   },
 ];
-

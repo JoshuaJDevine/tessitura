@@ -66,11 +66,8 @@ export const useUIStore = create<UIStore>((set) => ({
   openAddInstrument: () => set({ isAddInstrumentOpen: true }),
   closeAddInstrument: () => set({ isAddInstrumentOpen: false }),
 
-  openEditInstrument: (id) =>
-    set({ isEditInstrumentOpen: true, editingInstrumentId: id }),
-  closeEditInstrument: () =>
-    set({ isEditInstrumentOpen: false, editingInstrumentId: null }),
+  openEditInstrument: (id) => set({ isEditInstrumentOpen: true, editingInstrumentId: id }),
+  closeEditInstrument: () => set({ isEditInstrumentOpen: false, editingInstrumentId: null }),
 
   setSuggestedInstrument: (id) => set({ suggestedInstrumentId: id }),
 }));
-

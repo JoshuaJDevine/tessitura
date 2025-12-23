@@ -39,7 +39,9 @@
 /* React Flow custom styles */
 .react-flow__node {
   cursor: grab;
-  transition: transform 0.2s ease, opacity 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
 }
 
 .react-flow__node:active {
@@ -67,7 +69,9 @@
 .react-flow__edge {
   stroke: hsl(var(--muted-foreground));
   stroke-width: 2;
-  transition: stroke 0.2s ease, stroke-width 0.2s ease;
+  transition:
+    stroke 0.2s ease,
+    stroke-width 0.2s ease;
 }
 
 .react-flow__edge.selected {
@@ -93,4 +97,3 @@
 .animate-fade-in {
   animation: fadeIn 0.3s ease-out;
 }
-

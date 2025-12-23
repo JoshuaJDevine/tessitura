@@ -21,16 +21,15 @@ export function Sidebar() {
           Add Instrument
         </Button>
       </div>
-      
+
       <div className="flex-1 overflow-y-auto">
         <FilterPanel />
         <TemplateLibrary />
         <DirectoryScanner />
         <Analytics />
       </div>
-      
+
       <AddInstrument />
     </div>
   );
 }
-
