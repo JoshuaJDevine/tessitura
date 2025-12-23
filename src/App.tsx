@@ -1,5 +1,5 @@
 import { Sidebar } from '@/components/Sidebar/Sidebar';
-import { Canvas } from '@/components/Canvas/Canvas';
+import { CollectionView } from '@/components/Collection/CollectionView';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 
 function App() {
@@ -8,9 +8,7 @@ function App() {
   return (
     <div className="flex h-screen w-screen overflow-hidden">
       <Sidebar />
-      <div className="flex-1">
-        <Canvas />
-      </div>
+      <CollectionView />
     </div>
   );
 }
