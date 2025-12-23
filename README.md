@@ -1,6 +1,13 @@
-# Music Plugin Organizer
+# Music Plugin Organizer (Tessitura)
 
 A desktop React application for visually organizing music production plugins and sample libraries using an infinite spatial canvas with nodes, connections, and intelligent discovery features.
+
+## 🌐 Live Deployments
+
+- **🎹 [Web App](https://joshuajdevine.github.io/tessitura/)** - Try the app in your browser
+- **📚 [Documentation](https://joshuajdevine.github.io/tessitura/docs/)** - Full documentation site
+- **📖 [GitHub Wiki](https://github.com/JoshuaJDevine/tessitura/wiki)** - Editable documentation
+- **💻 [GitHub Repository](https://github.com/JoshuaJDevine/tessitura)** - Source code
 
 ## Features
 

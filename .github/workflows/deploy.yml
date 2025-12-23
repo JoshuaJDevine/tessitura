@@ -1,4 +1,4 @@
-name: Deploy Web App
+name: Deploy App & Documentation
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -17,9 +17,13 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build:
-    name: Build Web Application
+  build-and-deploy:
+    name: Build & Deploy Everything
     runs-on: ubuntu-latest
+    
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     
     steps:
       - name: Checkout code
@@ -38,22 +42,320 @@ jobs:
         run: npm run build
         env:
           CI: true
+      
+      # Create combined deployment directory
+      - name: Prepare deployment structure
+        run: |
+          # Create deployment directory
+          mkdir -p deploy
           
-      - name: Upload artifact
+          # Copy web app to root
+          cp -r dist/* deploy/
+          
+          # Create docs directory
+          mkdir -p deploy/docs
+          
+      - name: Generate documentation site
+        run: |
+          # Copy markdown documentation
+          cp -r docs/* deploy/docs/ 2>/dev/null || true
+          cp README.md deploy/docs/ 2>/dev/null || true
+          cp CHANGELOG.md deploy/docs/ 2>/dev/null || true
+          
+          # Create documentation index page
+          cat > deploy/docs/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Tessitura - Documentation</title>
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
+            <style>
+              body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 2rem;
+                line-height: 1.6;
+                background: #0d1117;
+                color: #c9d1d9;
+              }
+              .header {
+                background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+                padding: 3rem 2rem;
+                border-radius: 1rem;
+                margin-bottom: 3rem;
+                text-align: center;
+              }
+              .header h1 {
+                color: white;
+                margin: 0 0 1rem 0;
+                font-size: 3rem;
+              }
+              .header p {
+                color: rgba(255,255,255,0.9);
+                font-size: 1.25rem;
+                margin: 0;
+              }
+              .nav {
+                background: #161b22;
+                padding: 1rem 2rem;
+                border-radius: 0.5rem;
+                margin-bottom: 2rem;
+                display: flex;
+                gap: 2rem;
+                align-items: center;
+              }
+              .nav a {
+                color: #58a6ff;
+                text-decoration: none;
+                padding: 0.5rem 1rem;
+                border-radius: 0.25rem;
+                transition: background 0.2s;
+              }
+              .nav a:hover {
+                background: #21262d;
+              }
+              .section {
+                margin: 2rem 0;
+              }
+              .section h2 {
+                color: #58a6ff;
+                border-bottom: 1px solid #30363d;
+                padding-bottom: 0.5rem;
+                margin-top: 2rem;
+              }
+              .card {
+                background: #161b22;
+                border: 1px solid #30363d;
+                border-radius: 0.5rem;
+                padding: 1.5rem;
+                margin: 1rem 0;
+                transition: transform 0.2s, border-color 0.2s;
+              }
+              .card:hover {
+                transform: translateY(-2px);
+                border-color: #58a6ff;
+              }
+              .card h3 {
+                margin-top: 0;
+                color: #c9d1d9;
+              }
+              .card a {
+                color: #58a6ff;
+                text-decoration: none;
+                font-size: 1.1rem;
+                font-weight: 600;
+              }
+              .card a:hover {
+                text-decoration: underline;
+              }
+              .card p {
+                color: #8b949e;
+                margin: 0.5rem 0 0 0;
+              }
+              .grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 1.5rem;
+                margin-top: 2rem;
+              }
+              .badge {
+                display: inline-block;
+                padding: 0.25rem 0.75rem;
+                border-radius: 1rem;
+                font-size: 0.875rem;
+                font-weight: 600;
+                margin-right: 0.5rem;
+              }
+              .badge-blue { background: #1f6feb; color: white; }
+              .badge-purple { background: #8957e5; color: white; }
+              .badge-green { background: #2ea043; color: white; }
+            </style>
+          </head>
+          <body>
+            <div class="header">
+              <h1>🎹 Tessitura</h1>
+              <p>Music Plugin Organizer - Documentation</p>
+            </div>
+            
+            <div class="nav">
+              <a href="../">← Back to App</a>
+              <a href="https://github.com/JoshuaJDevine/tessitura">GitHub Repository</a>
+              <a href="https://github.com/JoshuaJDevine/tessitura/issues">Report Issues</a>
+            </div>
+            
+            <div class="section">
+              <h2>📚 Getting Started</h2>
+              <div class="grid">
+                <div class="card">
+                  <h3><a href="README.html">📖 README</a></h3>
+                  <p>Project overview, installation guide, and quick start</p>
+                  <span class="badge badge-blue">Essential</span>
+                </div>
+                <div class="card">
+                  <h3><a href="CHANGELOG.html">📝 CHANGELOG</a></h3>
+                  <p>Version history and release notes</p>
+                  <span class="badge badge-green">Updated</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="section">
+              <h2>🏗️ Architecture</h2>
+              <div class="grid">
+                <div class="card">
+                  <h3><a href="architecture/decisions.html">🎯 Architecture Decisions</a></h3>
+                  <p>ADRs documenting major architectural choices and rationale</p>
+                  <span class="badge badge-purple">Technical</span>
+                </div>
+                <div class="card">
+                  <h3><a href="architecture/data-model.html">💾 Data Model</a></h3>
+                  <p>Data structures, relationships, and schema definitions</p>
+                  <span class="badge badge-purple">Technical</span>
+                </div>
+                <div class="card">
+                  <h3><a href="architecture/state-management.html">⚡ State Management</a></h3>
+                  <p>State management patterns, stores, and data flow</p>
+                  <span class="badge badge-purple">Technical</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="section">
+              <h2>🔗 Quick Links</h2>
+              <div class="card">
+                <ul style="margin: 0; padding-left: 1.5rem;">
+                  <li><a href="https://github.com/JoshuaJDevine/tessitura">GitHub Repository</a></li>
+                  <li><a href="https://github.com/JoshuaJDevine/tessitura/issues">Report Issues</a></li>
+                  <li><a href="https://github.com/JoshuaJDevine/tessitura/pulls">Pull Requests</a></li>
+                  <li><a href="https://github.com/JoshuaJDevine/tessitura/wiki">GitHub Wiki</a></li>
+                </ul>
+              </div>
+            </div>
+            
+            <div class="section" style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid #30363d;">
+              <p style="text-align: center; color: #8b949e;">
+                Built with ❤️ using React, TypeScript, and Vite
+              </p>
+            </div>
+          </body>
+          </html>
+          EOF
+          
+      - name: Convert markdown to HTML
+        run: |
+          # Install markdown converter
+          npm install -g marked
+          
+          # Convert markdown files to HTML with GitHub styling
+          for file in deploy/docs/*.md deploy/docs/**/*.md; do
+            if [ -f "$file" ]; then
+              html_file="${file%.md}.html"
+              cat > "$html_file" << 'HEADER'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Documentation</title>
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
+            <style>
+              body {
+                background: #0d1117;
+                padding: 2rem;
+              }
+              .markdown-body {
+                max-width: 980px;
+                margin: 0 auto;
+                padding: 3rem;
+                background: #0d1117;
+              }
+              .nav {
+                max-width: 980px;
+                margin: 0 auto 1rem auto;
+                padding: 1rem;
+                background: #161b22;
+                border-radius: 0.5rem;
+              }
+              .nav a {
+                color: #58a6ff;
+                text-decoration: none;
+                margin-right: 1rem;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="nav">
+              <a href="../docs/">← Back to Docs</a>
+              <a href="../">Main App</a>
+            </div>
+            <div class="markdown-body">
+          HEADER
+              marked "$file" >> "$html_file"
+              echo '</div></body></html>' >> "$html_file"
+            fi
+          done
+          
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./dist
-
-  deploy:
-    name: Deploy to GitHub Pages
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    
-    steps:
+          path: ./deploy
+          
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+  
+  update-wiki:
+    name: Update GitHub Wiki
+    runs-on: ubuntu-latest
+    needs: build-and-deploy
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Checkout wiki
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository }}.wiki
+          path: wiki
+          
+      - name: Update wiki pages
+        run: |
+          # Copy documentation to wiki
+          cp README.md wiki/Home.md 2>/dev/null || true
+          cp CHANGELOG.md wiki/Changelog.md 2>/dev/null || true
+          cp docs/architecture/decisions.md wiki/Architecture-Decisions.md 2>/dev/null || true
+          cp docs/architecture/data-model.md wiki/Data-Model.md 2>/dev/null || true
+          cp docs/architecture/state-management.md wiki/State-Management.md 2>/dev/null || true
+          
+          # Create a table of contents
+          cat > wiki/_Sidebar.md << 'EOF'
+          ## 📚 Documentation
+          
+          * [Home](Home)
+          * [Changelog](Changelog)
+          
+          ## 🏗️ Architecture
+          
+          * [Architecture Decisions](Architecture-Decisions)
+          * [Data Model](Data-Model)
+          * [State Management](State-Management)
+          
+          ## 🔗 Links
+          
+          * [Live App](https://joshuajdevine.github.io/tessitura/)
+          * [Documentation Site](https://joshuajdevine.github.io/tessitura/docs/)
+          * [GitHub Repository](https://github.com/JoshuaJDevine/tessitura)
+          EOF
+          
+      - name: Commit and push wiki changes
+        run: |
+          cd wiki
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update wiki from main branch [skip ci]" && git push)
 
