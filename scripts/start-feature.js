@@ -26,6 +26,21 @@ function question(query) {
   return new Promise((resolve) => rl.question(query, resolve));
 }
 
+/**
+ * Sanitize feature name to be git-friendly (kebab-case)
+ * @param {string} name - The raw feature name
+ * @returns {string} - Sanitized name suitable for git branch
+ */
+function sanitizeFeatureName(name) {
+  return name
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
+    .replace(/\s+/g, '-') // Replace spaces with hyphens
+    .replace(/-+/g, '-') // Replace multiple hyphens with single
+    .replace(/^-|-$/g, ''); // Remove leading/trailing hyphens
+}
+
 async function main() {
   console.log('🚀 Starting New Feature\n');
 
@@ -61,12 +76,21 @@ async function main() {
   }
 
   // Get feature details
-  const featureName = await question('Feature name (e.g., "canvas-zoom"): ');
-  if (!featureName.trim()) {
+  const rawFeatureName = await question('Feature name (e.g., "canvas-zoom"): ');
+  if (!rawFeatureName.trim()) {
     console.log('❌ Feature name is required');
     process.exit(1);
   }
 
+  // Sanitize feature name for git branch
+  const featureName = sanitizeFeatureName(rawFeatureName);
+  if (!featureName) {
+    console.log('❌ Invalid feature name (contains only special characters)');
+    process.exit(1);
+  }
+
+  console.log(`📝 Sanitized name: "${featureName}"`);
+  
   const branchName = `feature/${featureName}`;
   const description = await question('Brief description: ');
   const engineer = await question('Your name: ');
