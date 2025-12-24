@@ -548,4 +548,74 @@ Implement interactive cards with usage-based visual rarity system:
 - ADR-007: shadcn/ui - Still primary component library
 - ADR-008: TypeScript Strict - Still enforced
 
+---
+
+## ADR-015: Directory Scanning Bug Fixes
+
+**Date:** 2025-12-24  
+**Status:** Accepted
+
+### Context
+
+Directory scanning feature exists but has critical bugs preventing use:
+1. "Scan Directories" button in empty state opens Add Instrument modal instead of scanning
+2. Directory scanning buttons are disabled in Electron app (`window.electronAPI` not available)
+3. No user feedback explaining why buttons are disabled or what to do
+
+Users cannot populate the collection with their actual plugins, blocking core functionality.
+
+### Decision
+
+Fix critical bugs to make directory scanning functional:
+1. Fix CollectionView "Scan Directories" button to trigger actual scanning
+2. Fix Electron API exposure (preload script contextBridge)
+3. Add better error handling and user feedback
+4. Add diagnostic logging for Electron API availability
+
+**Scope:** Bug fixes only, no new features. Get existing functionality working.
+
+### Rationale
+
+1. **Blocks Core Functionality**: Users can't import plugins without this working
+2. **Quick Win**: These are straightforward bugs, not architectural issues
+3. **Validates Approach**: Need working scanning before building enhanced features
+4. **User Experience**: Clear feedback prevents confusion
+
+### Consequences
+
+- **Positive:** 
+  - Users can actually scan and import plugins
+  - Better error messages guide users
+  - Foundation for enhanced directory management (Phase 2.1)
+  
+- **Negative:** 
+  - None - these are bug fixes
+  
+- **Mitigation:**
+  - Add console logging for debugging Electron API issues
+  - Clear error messages guide users to solutions
+
+### Implementation Details
+
+**Bug 1: CollectionView Button**
+- Change `onClick={openAddInstrument}` to trigger directory scanning
+- Options: Direct call to DirectoryScanner function, or expose scanning action from store
+
+**Bug 2: Electron API Not Available**
+- Verify preload script is loading correctly
+- Check contextBridge is exposing API before window loads
+- Add diagnostic logging to identify timing issues
+- Ensure preload path is correct in main.ts
+
+**Bug 3: User Feedback**
+- Show tooltip/alert when Electron API unavailable
+- Explain that Electron app is required (not web mode)
+- Add console warnings for developers
+
+### Related
+- ADR-010: Auto-Scanning (original feature)
+- Component: `src/components/Collection/CollectionView.tsx`
+- Component: `src/components/Sidebar/DirectoryScanner.tsx`
+- Electron: `electron/main.ts`, `electron/preload.ts`
+
 

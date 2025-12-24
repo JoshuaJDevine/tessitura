@@ -45,3 +45,6 @@ Thumbs.db
 .cursor/doc-prompt.txt
 .cursor/features/active/
 .cursor/features/completed/
+
+# Custom
+docs/architecture/feature-list.md
