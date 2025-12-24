@@ -148,7 +148,7 @@ describe('DirectoryScanner', () => {
       fireEvent.click(button);
 
       await waitFor(() => {
-        expect(alertSpy).toHaveBeenCalledWith('Error scanning directory. Please try again.');
+        expect(alertSpy).toHaveBeenCalledWith('Scan failed');
       });
 
       expect(consoleErrorSpy).toHaveBeenCalled();

@@ -100,6 +100,21 @@ vi.mock('@/store/uiStore', () => ({
   useUIStore: () => mockUseUIStore() as ReturnType<typeof useUIStore>,
 }));
 
+// Mock useDirectoryScanner hook
+const mockHandleAutoScan = vi.fn();
+const mockImportInstruments = vi.fn();
+
+vi.mock('@/hooks/useDirectoryScanner', () => ({
+  useDirectoryScanner: vi.fn(() => ({
+    isAutoScanning: false,
+    isScanning: false,
+    scanProgress: { current: 0, total: 0, path: '', found: 0 },
+    handleAutoScan: mockHandleAutoScan,
+    handleScan: vi.fn(),
+    importInstruments: mockImportInstruments,
+  })),
+}));
+
 // Mock window.innerWidth for responsive tests
 const originalInnerWidth = window.innerWidth;
 const originalAddEventListener = window.addEventListener;
@@ -138,10 +153,13 @@ describe('CollectionView', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockHandleAutoScan.mockClear();
+    mockImportInstruments.mockClear();
     mockUseInstrumentStore.mockReturnValue({
       instruments: mockInstruments,
     });
     mockUseUIStore.mockReturnValue(getDefaultUIStoreMock());
+    delete (window as any).electronAPI;
   });
 
   afterEach(() => {
@@ -494,6 +512,176 @@ describe('CollectionView', () => {
 
       render(<CollectionView />);
       expect(screen.queryByRole('button', { name: /Scan Directories/i })).not.toBeInTheDocument();
+    });
+  });
+
+  describe('scan directories functionality', () => {
+    it('should show scan button when no instruments exist', () => {
+      mockUseInstrumentStore.mockReturnValue({
+        instruments: [],
+      });
+
+      render(<CollectionView />);
+      // Button exists but is disabled when electronAPI unavailable
+      const button = screen.getByRole('button', { name: /Scan Directories/i });
+      expect(button).toBeInTheDocument();
+      expect(button).toBeDisabled();
+    });
+
+    it('should enable scan button when Electron API is available', () => {
+      mockUseInstrumentStore.mockReturnValue({
+        instruments: [],
+      });
+
+      (window as any).electronAPI = {
+        scanDirectory: vi.fn(),
+        selectDirectory: vi.fn(),
+      };
+
+      render(<CollectionView />);
+      const button = screen.getByRole('button', { name: /Scan Directories/i });
+      expect(button).not.toBeDisabled();
+    });
+
+    it('should trigger handleAutoScan when scan button is clicked', async () => {
+      mockUseInstrumentStore.mockReturnValue({
+        instruments: [],
+      });
+
+      (window as any).electronAPI = {
+        scanDirectory: vi.fn(),
+        selectDirectory: vi.fn(),
+      };
+
+      mockHandleAutoScan.mockResolvedValue([
+        {
+          name: 'BBC Symphony',
+          path: '/path/bbc',
+          isDirectory: true,
+          parsed: {
+            developer: 'Spitfire Audio',
+            instrumentName: 'BBC Symphony',
+            host: 'Kontakt',
+            category: 'Orchestral',
+          },
+        },
+      ]);
+
+      render(<CollectionView />);
+      const button = screen.getByRole('button', { name: /Scan Directories/i });
+      fireEvent.click(button);
+
+      await waitFor(() => {
+        expect(mockHandleAutoScan).toHaveBeenCalledTimes(1);
+      });
+    });
+
+    it('should show import preview dialog after successful scan', async () => {
+      mockUseInstrumentStore.mockReturnValue({
+        instruments: [],
+      });
+
+      (window as any).electronAPI = {
+        scanDirectory: vi.fn(),
+        selectDirectory: vi.fn(),
+      };
+
+      const scannedItems = [
+        {
+          name: 'BBC Symphony',
+          path: '/path/bbc',
+          isDirectory: true,
+          parsed: {
+            developer: 'Spitfire Audio',
+            instrumentName: 'BBC Symphony',
+            host: 'Kontakt',
+            category: 'Orchestral',
+          },
+        },
+      ];
+
+      mockHandleAutoScan.mockResolvedValue(scannedItems);
+
+      render(<CollectionView />);
+      const button = screen.getByRole('button', { name: /Scan Directories/i });
+      fireEvent.click(button);
+
+      await waitFor(() => {
+        expect(screen.getByText('Import Instruments')).toBeInTheDocument();
+      });
+
+      expect(screen.getByText('BBC Symphony')).toBeInTheDocument();
+      expect(screen.getByText('Spitfire Audio')).toBeInTheDocument();
+    });
+
+    it('should import selected instruments when Import button is clicked', async () => {
+      mockUseInstrumentStore.mockReturnValue({
+        instruments: [],
+      });
+
+      (window as any).electronAPI = {
+        scanDirectory: vi.fn(),
+        selectDirectory: vi.fn(),
+      };
+
+      const scannedItems = [
+        {
+          name: 'BBC Symphony',
+          path: '/path/bbc',
+          isDirectory: true,
+          parsed: {
+            developer: 'Spitfire Audio',
+            instrumentName: 'BBC Symphony',
+            host: 'Kontakt',
+            category: 'Orchestral',
+          },
+        },
+      ];
+
+      mockHandleAutoScan.mockResolvedValue(scannedItems);
+
+      render(<CollectionView />);
+      const scanButton = screen.getByRole('button', { name: /Scan Directories/i });
+      fireEvent.click(scanButton);
+
+      await waitFor(() => {
+        expect(screen.getByText('Import Instruments')).toBeInTheDocument();
+      });
+
+      const importButton = screen.getByRole('button', { name: /Import 1 Instrument/i });
+      fireEvent.click(importButton);
+
+      await waitFor(() => {
+        expect(mockImportInstruments).toHaveBeenCalledTimes(1);
+        expect(mockImportInstruments).toHaveBeenCalledWith(scannedItems);
+      });
+    });
+
+    it('should handle scan errors by showing alert', async () => {
+      const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      mockUseInstrumentStore.mockReturnValue({
+        instruments: [],
+      });
+
+      (window as any).electronAPI = {
+        scanDirectory: vi.fn(),
+        selectDirectory: vi.fn(),
+      };
+
+      mockHandleAutoScan.mockRejectedValue(new Error('Scan failed'));
+
+      render(<CollectionView />);
+      const button = screen.getByRole('button', { name: /Scan Directories/i });
+      fireEvent.click(button);
+
+      await waitFor(() => {
+        expect(alertSpy).toHaveBeenCalledWith('Scan failed');
+      });
+
+      alertSpy.mockRestore();
+      consoleErrorSpy.mockRestore();
     });
   });
 
