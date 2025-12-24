@@ -31,8 +31,11 @@ function createWindow() {
   }
 }
 
-// IPC Handlers
+// IPC Handlers - Register before app.whenReady()
+console.log('[main] Registering IPC handlers...');
+
 ipcMain.handle('select-directory', async () => {
+  console.log('[main] select-directory IPC called');
   const result = await dialog.showOpenDialog({
     properties: ['openDirectory'],
   });
@@ -40,14 +43,15 @@ ipcMain.handle('select-directory', async () => {
 });
 
 ipcMain.handle('scan-directory', async (_event, dirPath: string) => {
+  console.log('[main] scan-directory IPC called with:', dirPath);
   try {
     const items: Array<{ name: string; path: string; isDirectory: boolean }> = [];
-    
+
     async function scanDir(currentPath: string, depth = 0) {
       if (depth > 5) return; // Limit recursion depth
-      
+
       const entries = await readdir(currentPath);
-      
+
       for (const entry of entries) {
         const fullPath = path.join(currentPath, entry);
         try {
@@ -64,7 +68,7 @@ ipcMain.handle('scan-directory', async (_event, dirPath: string) => {
         }
       }
     }
-    
+
     await scanDir(dirPath);
     return items;
   } catch (error) {
@@ -74,6 +78,8 @@ ipcMain.handle('scan-directory', async (_event, dirPath: string) => {
 });
 
 app.whenReady().then(() => {
+  console.log('[main] App ready, creating window...');
+  console.log('[main] Preload path:', path.join(__dirname, 'preload.js'));
   createWindow();
 
   app.on('activate', () => {
@@ -88,4 +94,3 @@ app.on('window-all-closed', () => {
     app.quit();
   }
 });
-

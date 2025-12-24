@@ -328,15 +328,13 @@ describe('useDirectoryScanner', () => {
     });
 
     it('should successfully scan selected directory', async () => {
-      const mockScanDirectory = vi
-        .fn()
-        .mockResolvedValue([
-          {
-            name: 'Developer - Instrument',
-            path: '/path/Developer - Instrument',
-            isDirectory: true,
-          },
-        ]);
+      const mockScanDirectory = vi.fn().mockResolvedValue([
+        {
+          name: 'Developer - Instrument',
+          path: '/path/Developer - Instrument',
+          isDirectory: true,
+        },
+      ]);
 
       (window as any).electronAPI = {
         scanDirectory: mockScanDirectory,

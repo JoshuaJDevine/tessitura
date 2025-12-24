@@ -5,17 +5,26 @@ import { InstrumentCard } from './InstrumentCard';
 import { CollectionHeader } from './CollectionHeader';
 import { Button } from '@/components/ui/button';
 import { FolderOpen, Search } from 'lucide-react';
+import { useDirectoryScanner, ScannedItem } from '@/hooks/useDirectoryScanner';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Badge } from '@/components/ui/badge';
 
 export function CollectionView() {
   const { instruments, markAsUsed } = useInstrumentStore();
-  const {
-    searchQuery,
-    selectedCategories,
-    selectedHosts,
-    collectionView,
-    toggleCardSelection,
-    openAddInstrument,
-  } = useUIStore();
+  const { searchQuery, selectedCategories, selectedHosts, collectionView, toggleCardSelection } =
+    useUIStore();
+  const { isAutoScanning, handleAutoScan, importInstruments } = useDirectoryScanner();
+
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [scannedItems, setScannedItems] = useState<ScannedItem[]>([]);
+  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
 
   const [gridCols, setGridCols] = useState('grid-cols-4');
 
@@ -84,6 +93,39 @@ export function CollectionView() {
     [markAsUsed]
   );
 
+  const handleScanDirectories = useCallback(async () => {
+    try {
+      const items = await handleAutoScan();
+      setScannedItems(items);
+      setSelectedItems(new Set(items.map((item) => item.path)));
+      setIsPreviewOpen(true);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to scan directories';
+      alert(message);
+      console.error('[CollectionView] Scan error:', error);
+    }
+  }, [handleAutoScan]);
+
+  const handleImport = useCallback(() => {
+    const itemsToImport = scannedItems.filter((item) => selectedItems.has(item.path));
+    importInstruments(itemsToImport);
+    setIsPreviewOpen(false);
+    setScannedItems([]);
+    setSelectedItems(new Set());
+  }, [scannedItems, selectedItems, importInstruments]);
+
+  const toggleItem = useCallback((path: string) => {
+    setSelectedItems((prev) => {
+      const next = new Set(prev);
+      if (next.has(path)) {
+        next.delete(path);
+      } else {
+        next.add(path);
+      }
+      return next;
+    });
+  }, []);
+
   // Empty state
   if (filteredInstruments.length === 0) {
     return (
@@ -100,10 +142,32 @@ export function CollectionView() {
             </p>
           </div>
           {instruments.length === 0 && (
-            <Button onClick={openAddInstrument} size="lg" className="mt-4">
-              <Search className="mr-2 h-4 w-4" />
-              Scan Directories
+            <Button
+              onClick={handleScanDirectories}
+              size="lg"
+              className="mt-4"
+              disabled={isAutoScanning || !window.electronAPI}
+            >
+              {isAutoScanning ? (
+                <>
+                  <Search className="mr-2 h-4 w-4 animate-spin" />
+                  Scanning...
+                </>
+              ) : (
+                <>
+                  <Search className="mr-2 h-4 w-4" />
+                  Scan Directories
+                </>
+              )}
             </Button>
+          )}
+
+          {!window.electronAPI && instruments.length === 0 && (
+            <p className="text-sm text-muted-foreground mt-2 max-w-md">
+              Note: Directory scanning requires the Electron app. Run{' '}
+              <code className="text-xs bg-muted px-1 py-0.5 rounded">npm run electron:dev</code> to
+              enable this feature.
+            </p>
           )}
         </div>
       </div>
@@ -127,6 +191,69 @@ export function CollectionView() {
           ))}
         </div>
       </div>
+
+      {/* Import Preview Dialog */}
+      <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Import Instruments</DialogTitle>
+            <DialogDescription>
+              Review and select instruments to import. {selectedItems.size} of {scannedItems.length}{' '}
+              selected.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-2 max-h-96 overflow-y-auto">
+            {scannedItems.map((item) => (
+              <div
+                key={item.path}
+                className={`flex items-center justify-between rounded border p-3 cursor-pointer hover:bg-accent ${
+                  selectedItems.has(item.path) ? 'border-primary bg-accent' : ''
+                }`}
+                onClick={() => toggleItem(item.path)}
+              >
+                <div className="flex-1">
+                  <p className="font-medium">{item.parsed?.instrumentName || item.name}</p>
+                  {item.parsed?.developer && (
+                    <p className="text-sm text-muted-foreground">{item.parsed.developer}</p>
+                  )}
+                  <div className="flex gap-2 mt-1">
+                    {item.parsed?.host && (
+                      <Badge variant="outline" className="text-xs">
+                        {item.parsed.host}
+                      </Badge>
+                    )}
+                    {item.parsed?.category && (
+                      <Badge variant="outline" className="text-xs">
+                        {item.parsed.category}
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={selectedItems.has(item.path)}
+                  onChange={(e) => {
+                    e.stopPropagation();
+                    toggleItem(item.path);
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                  className="ml-4"
+                />
+              </div>
+            ))}
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsPreviewOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleImport} disabled={selectedItems.size === 0}>
+              Import {selectedItems.size} Instrument(s)
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
